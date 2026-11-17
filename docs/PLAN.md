@@ -3,12 +3,20 @@
 Aggiornato al 17 novembre 2026. Si punta a fare **tutto**, ma nell'ordine di priorità qui sotto:
 in ogni momento deve esistere un progetto consegnabile.
 
-## Ruoli (da assegnare)
+## Ruoli
 | Ruolo | Responsabilità | Chi |
 |---|---|---|
-| **Dati e TimeNet** | Connettore 3W, test, CI, PR e rapporti con i maintainer; split; valutazione e statistiche | _da decidere_ |
-| **Modello e demo** | Collegamento TimeNet → OpenTSLM, spiegazioni, training su Modal, test di perturbazione, demo | _da decidere_ |
+| **Dati e TimeNet** | Connettore 3W, test, CI, PR e rapporti con i maintainer; contratto dei dati e split; valutazione, baseline e statistiche | RenatoGallicola |
+| **Modello e demo** | Collegamento TimeNet → OpenTSLM, finestre e spiegazioni, training su Modal, demo | ariannabalducci |
 | **Entrambi** | Post su X e LinkedIn, video, consegna | |
+
+Dopo il connettore (da giovedì), chi fa Dati e TimeNet prende anche blocchi interi della parte
+modelli, scelti tra: baseline forti, test di perturbazione, secondo training (Flamingo o
+sim-to-real), verifica della qualità delle spiegazioni. La valutazione finale sui pozzi di test resta
+a Dati e TimeNet, per tenerla indipendente da chi addestra. Prima di prendere un blocco, scriverlo in
+`docs/STATUS.md`.
+
+Chi parte da un PC nuovo segue `docs/SETUP.md`.
 
 Le due parti procedono in parallelo. Il punto di contatto è `docs/DATA_CONTRACT.md`: chi lavora
 sul modello prototipa leggendo i Parquet di 3W direttamente e passa al loader TimeNet quando il

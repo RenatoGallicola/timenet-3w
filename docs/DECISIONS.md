@@ -11,3 +11,6 @@ Una riga per decisione: data, decisione, motivo. Le più recenti in fondo.
 | 2026-11-17 | Training su Modal (gratis, con tetto di spesa a 0); Nebius opzionale | Nebius richiede una ricarica di 25 USD per il voucher; il team vuole spesa zero |
 | 2026-11-17 | Repo pubblico `timenet-3w` sul GitHub di uno dei membri; nome da prodotto deciso più avanti | Sviluppo in pubblico; nome provvisorio descrittivo |
 | 2026-11-17 | Sviluppo locale su Windows con uv, senza WSL | WSL non installato |
+| 2026-11-17 | 3W fissato al commit `c86cc7c70063646910be7292de8a54a6fb2a8399` (v2.0.0) | Ultimo commit al momento del download; tutto il team usa gli stessi dati |
+| 2026-11-17 | Ruoli: RenatoGallicola su Dati e TimeNet, ariannabalducci su Modello e demo | Le due parti procedono in parallelo; chi finisce il connettore prende poi blocchi della parte modelli |
+| 2026-11-17 | Non si aspetta il merge della PR | Per la consegna basta il link; il progetto installa TimeNet dal fork |
