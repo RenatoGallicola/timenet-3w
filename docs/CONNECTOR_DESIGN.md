@@ -1,7 +1,7 @@
 # Progetto del connettore `petrobras/3w`
 
-**Stato: bozza da approvare.** Secondo la skill `add-dataset-connector` di TimeNet, il codice si
-scrive solo dopo l'approvazione di ID, sorgente, tipo di task ed esempio di record.
+**Stato: approvato il 2026-11-17** (tutte e 5 le proposte). Implementato nel fork, branch
+`feature/petrobras-three-w`, cartella `packages/timenet-connectors/src/timenet_connectors/datasets/petrobras/three_w/`.
 
 Basato su: 3W v2.0.0 al commit `c86cc7c70063646910be7292de8a54a6fb2a8399`, l'esplorazione in
 `docs/3W_EXPLORATION.md` e i connettori esistenti di TimeNet (soprattutto `physionet/sleep-edfx`,
