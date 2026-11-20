@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #3, preparing the perturbation tool and testing it on XGBoost (the OpenTSLM part runs once a model exists). Next: README draft, post 1 | None |
+| RenatoGallicola (Data and TimeNet) | #3 tool ready (PR #21); its OpenTSLM part waits for a model. Next: README draft (#11), post 1 | OpenTSLM model for the rest of #3 |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,11 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-20 (RenatoGallicola): **#3 tool ready** (PR #21; issue still open): `scripts/perturb.py`
+  writes perturbed window folders (time shuffle, noise with the same statistics, signal or statistics
+  from another class, no statistics) with the prompt statistics in `stats_mean`/`stats_std`. Checked
+  on XGBoost (validation): shape 0.22 → 0.06 with time shuffle, mean_std unchanged.
+  **ariannabalducci: the bridge must read `stats_mean`/`stats_std` when present** (comment on #7).
 - 2026-11-20 (RenatoGallicola): **#5 done** (PR #20): simulated windows of classes 2, 8, 9 added to
   the XGBoost training, scored on real wells only. Validation 0.221 → 0.244, CV by well 0.316 → 0.347
   (± 0.09-0.13): a weak positive inside the noise; class 9 0.02 → 0.09. Simulated instances never
