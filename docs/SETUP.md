@@ -70,7 +70,11 @@ notepad .env
 ```
 `.env` is ignored by git: **never commit it**, and never write tokens in any other file.
 
-## 6. Download 3W at the same commit
+## 6. (Optional) Download the raw 3W files
+**Skip this step unless you need the original Parquet files**, for example to run
+`scripts/make_windows.py --source parquet` or `scripts/explore_3w.py`. Training only needs step 7,
+which downloads 3W by itself.
+
 The whole team uses 3W v2.0.0 at commit `c86cc7c70063646910be7292de8a54a6fb2a8399`. Download it into
 a `data` folder next to the repo, outside `timenet-3w`. It is about 1.9 GB:
 ```powershell
@@ -88,8 +92,8 @@ path in `.env` as `THREEW_DATASET_DIR`, for example
 
 ## 7. Build the TimeNet dataset and the windows
 The training windows come from the `petrobras/three-w` TimeNet dataset built by our connector. Build
-it once (it downloads 3W again from the pinned URLs: about 20 minutes, 1.1 GB on disk), then cut the
-windows:
+it once (it downloads 3W from the pinned URLs and checks every SHA-256: about 20 minutes, 1.1 GB on
+disk), then cut the windows. Both commands create their folders next to the repo, outside git:
 ```powershell
 cd $HOME\Desktop\TimeNet\timenet-3w
 uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --local-registry ..\registry
