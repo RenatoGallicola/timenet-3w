@@ -9,7 +9,7 @@ time).
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | #3 tool ready (PR #21); its OpenTSLM part waits for a model. Next: README draft (#11), post 1 | OpenTSLM model for the rest of #3 |
-| ariannabalducci (Model and demo) | #7 bridge and #8 run 1 done on branches (PRs next); next: decide run 2, then test predictions once | None |
+| ariannabalducci (Model and demo) | PRs #23 (#7) and #24 (#8) open; next: demo (#10) | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +25,13 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (ariannabalducci): **OpenTSLM run 1 on test** (run once, PR #24): macro-F1 **0.349**
+  against 0.403 for XGBoost shape (paired -0.05, CI -0.16 to 0.02); **false alarms 0.59**: 1,000 of
+  1,805 normal test windows are called scaling in PCK, and no flow-instability window of the two
+  test wells is recognized (validation class 4 came from one well). Per class 0: 0.43, 2: 0.88,
+  4: 0.00, 7: 0.02, 8: 0.28, 9: 0.48. Run 2 (balancing power 0.5) scored 0.315 on validation, so
+  run 1 stays the model. The validation gain does not transfer: the README must say so, and #3
+  becomes the main evidence about what the model reads.
 - 2026-11-21 (ariannabalducci): **OpenTSLM run 1** (#8, branch `issue/8-train-opentslm`):
   `scripts/opentslm_modal.py` trains on Modal from `OpenTSLM/llama-3.2-1b-har-sp` with the bridge of
   #7 (`scripts/opentslm_bridge.py`, branch `issue/7-opentslm-bridge`). **Validation macro-F1 0.510**
