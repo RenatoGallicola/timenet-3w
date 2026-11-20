@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #5 (simulated instances); #3 (perturbation tests) once an OpenTSLM model exists; post 1 | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #5 (simulated instances in training). Next: #3 (perturbation tests) once an OpenTSLM model exists; post 1 | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
