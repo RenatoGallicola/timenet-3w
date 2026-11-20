@@ -1,9 +1,12 @@
 """Cut Petrobras 3W real instances into fixed windows, following docs/DATA_CONTRACT.md.
 
 Usage:
-    uv run python scripts/make_windows.py <3W dataset folder> <output folder> [--splits splits/wells.json]
+    uv run python scripts/make_windows.py <source> <output folder> [--source timenet|parquet] [--splits ...]
 
-Reads the Parquet files directly (before the TimeNet connector is ready). Writes, for each split,
+With `--source timenet` (the default), <source> is a local TimeNet registry that holds the
+`petrobras/three-w` dataset built by the connector of OpenTSLM/TimeNet PR #833. With
+`--source parquet`, <source> is the `dataset/` folder of a 3W checkout and the Parquet files are read
+directly. Both sources give the same windows (checked by scripts/compare_windows.py). Writes, for each split,
 `{split}.npz` (X [N, 6, 180] float32 with NaN, mask [N, 6] bool, y [N] int) and `{split}.csv`
 (one row per window, same order), plus `meta.json`. If the splits file does not exist, a split by
 well is searched with a fixed seed and saved there.
@@ -15,6 +18,7 @@ import argparse
 import json
 import warnings
 from collections import defaultdict
+from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
@@ -22,6 +26,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 THREEW_COMMIT = "c86cc7c70063646910be7292de8a54a6fb2a8399"
+TIMENET_DATASET = "petrobras/three-w"
 VARIABLES = ["P-TPT", "T-TPT", "P-ANULAR", "P-MON-CKP", "P-JUS-CKGL", "T-JUS-CKP"]
 CLASSES = [0, 2, 4, 7, 8, 9]
 CLASS_NAMES = {
@@ -67,6 +72,51 @@ def read_instance(path: Path) -> tuple[np.ndarray, np.ndarray]:
     return values, labels
 
 
+def iter_parquet(dataset_dir: Path) -> Iterator[tuple[str, int, np.ndarray, np.ndarray]]:
+    """Yield (instance, event class, values, labels) for each real instance of a 3W checkout."""
+    files = sorted(dataset_dir.glob("*/WELL-*.parquet"))
+    if not files:
+        raise SystemExit(f"No real instances found under {dataset_dir}")
+    for path in files:
+        values, labels = read_instance(path)
+        yield path.stem, int(path.parent.name), values, labels
+
+
+def iter_timenet(registry: Path) -> Iterator[tuple[str, int, np.ndarray, np.ndarray]]:
+    """Yield (instance, event class, values, labels) for each real record of the TimeNet dataset.
+
+    The per-second labels are rebuilt from the `event_phase` interval annotations of the
+    connector: `normal` is 0, `steady` is the event code, `transient` is 100 + the event code, and
+    a second outside every interval stays unlabeled (NaN), as in the source.
+    """
+    import timenet
+    from timenet.types.text import read_value
+
+    us_per_s = 1_000_000
+    with timenet.TimeNet(sources=[str(registry)]).open(TIMENET_DATASET) as reader:
+        dataset = reader.read()
+        records = [r for r in dataset.records if r.metadata["provenance"] == "real"]
+        if not records:
+            raise SystemExit(f"No real records found in {TIMENET_DATASET} under {registry}")
+        records.sort(key=lambda r: (int(r.metadata["event_code"]), str(r.metadata["instance"])))
+        for record in records:
+            event = int(record.metadata["event_code"])
+            n = record.time_span.exclusive_end // us_per_s
+            signals = {s.name: s for source in record.sources for s in source.signals}
+            values = np.full((len(VARIABLES), n), np.nan, dtype=np.float64)
+            for i, var in enumerate(VARIABLES):
+                if var in signals:
+                    values[i] = signals[var].to_arrow().to_numpy(zero_copy_only=False).astype(np.float64)
+            labels = np.full(n, np.nan, dtype=np.float64)
+            for annotation in record.annotations:
+                if annotation.key != "event_phase" or annotation.span is None:
+                    continue
+                phase = read_value(annotation.value)
+                code = {"normal": 0, "steady": event, "transient": 100 + event}[phase]
+                labels[annotation.span.start_us // us_per_s : annotation.span.exclusive_end // us_per_s] = code
+            yield str(record.metadata["instance"]), event, values, labels
+
+
 def label_window(labels: np.ndarray, event_class: int) -> tuple[int | None, str, float, float]:
     """Apply the labelling rule of the contract. Returns (label or None, phase, event_frac, transient_frac)."""
     n = len(labels)
@@ -94,10 +144,8 @@ def resample(values: np.ndarray) -> np.ndarray:
         return np.nanmean(blocks, axis=2).astype(np.float32)
 
 
-def windows_of_instance(path: Path) -> list[dict]:
+def windows_of_instance(instance: str, event_class: int, values: np.ndarray, labels: np.ndarray) -> list[dict]:
     """Cut one real instance into labelled windows (at most MAX_WINDOWS_PER_INSTANCE)."""
-    event_class = int(path.parent.name)
-    values, labels = read_instance(path)
     n = labels.shape[0]
     candidates = []
     for start in range(0, n - WINDOW_S + 1, EVENT_STRIDE_S):
@@ -112,8 +160,8 @@ def windows_of_instance(path: Path) -> list[dict]:
             continue
         candidates.append(
             {
-                "instance": path.stem,
-                "well": path.stem.split("_")[0],
+                "instance": instance,
+                "well": instance.split("_")[0],
                 "label": label,
                 "phase": phase,
                 "start_s": start,
@@ -168,19 +216,19 @@ def search_split(counts: pd.DataFrame) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("dataset_dir", type=Path)
+    parser.add_argument("source_dir", type=Path, help="TimeNet registry (default) or 3W dataset/ folder")
     parser.add_argument("out_dir", type=Path)
+    parser.add_argument("--source", choices=("timenet", "parquet"), default="timenet")
     parser.add_argument("--splits", type=Path, default=Path(__file__).resolve().parent.parent / "splits" / "wells.json")
     args = parser.parse_args()
 
-    files = sorted(args.dataset_dir.glob("*/WELL-*.parquet"))
-    if not files:
-        raise SystemExit(f"No real instances found under {args.dataset_dir}")
+    instances = iter_timenet(args.source_dir) if args.source == "timenet" else iter_parquet(args.source_dir)
     windows: list[dict] = []
-    for i, path in enumerate(files, 1):
-        windows.extend(windows_of_instance(path))
-        if i % 100 == 0 or i == len(files):
-            print(f"{i}/{len(files)} instances, {len(windows)} windows")
+    for i, (instance, event_class, values, labels) in enumerate(instances, 1):
+        windows.extend(windows_of_instance(instance, event_class, values, labels))
+        if i % 100 == 0:
+            print(f"{i} instances, {len(windows)} windows")
+    print(f"{i} instances, {len(windows)} windows")
 
     meta_rows = pd.DataFrame([{k: v for k, v in w.items() if k not in ("x", "mask")} for w in windows])
     counts = meta_rows.groupby(["well", "label"]).size().unstack(fill_value=0).reindex(columns=CLASSES, fill_value=0)
@@ -221,6 +269,7 @@ def main() -> None:
         }
 
     meta = {
+        "source": f"TimeNet {TIMENET_DATASET}" if args.source == "timenet" else "3W Parquet files",
         "threew_commit": THREEW_COMMIT,
         "variables": VARIABLES,
         "classes": {str(c): CLASS_NAMES[c] for c in CLASSES},
