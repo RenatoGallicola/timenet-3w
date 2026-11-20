@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** `make_windows.py` reads the TimeNet dataset built by the connector instead of the Parquet files, and checks that the windows are identical (issue "Read training windows from the TimeNet dataset") | None |
+| RenatoGallicola (Data and TimeNet) | Next: #12 (rerun the baselines with the connector split), then #2 (evaluation script) | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,12 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-20 (RenatoGallicola): **#1 done** (PR #13): `scripts/make_windows.py` reads the
+  `petrobras/three-w` TimeNet dataset by default; `scripts/compare_windows.py` confirms the windows
+  are identical to the Parquet ones (18,737 windows with the connector split: 12,827 / 2,690 /
+  3,220). Commands to build the dataset and cut the windows are in `docs/DATA_CONTRACT.md` and
+  `docs/SETUP.md`. **ariannabalducci: train on these windows** (`--splits
+  splits/wells_connector.json`).
 - 2026-11-20 (RenatoGallicola): **PR #833 fixes done** (3 commits, marked "Ready for review"): no
   absolute start time (3W states no time zone; the start stays as text in `metadata["start"]`); card
   with `source_revision`, `license_url` and the 2.0.0 citation; connector `README.md`. **Split
