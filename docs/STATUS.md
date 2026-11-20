@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #15 (lead-time analysis), #4, #5 with XGBoost; #3 (perturbation tests) once an OpenTSLM model exists | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #15 (lead-time analysis). Next: #4, #5 with XGBoost; #3 (perturbation tests) once an OpenTSLM model exists | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
