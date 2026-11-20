@@ -166,14 +166,20 @@ def report(y: np.ndarray, pred: np.ndarray, phase: np.ndarray, labels: list[int]
     }
 
 
-def run(folder: Path, kind: str, labels: list[int]) -> dict:
+def run(folder: Path, kind: str, labels: list[int], predictions_dir: Path | None = None) -> dict:
     data = {s: load(folder, s) for s in ("train", "val", "test")}
     X, mask, y, _ = data["train"]
     model = fit(X, mask, y, kind, labels)
     out = {}
     for split in ("val", "test"):
         X, mask, y, meta = data[split]
-        out[split] = report(y, predict(model, X, mask, kind, labels), meta["phase"].to_numpy(), labels)
+        pred = predict(model, X, mask, kind, labels)
+        out[split] = report(y, pred, meta["phase"].to_numpy(), labels)
+        if predictions_dir is not None:
+            # The common predictions format read by scripts/evaluate.py.
+            predictions_dir.mkdir(parents=True, exist_ok=True)
+            rows = pd.DataFrame({"window_id": meta["window_id"], "prediction": pred})
+            rows.to_csv(predictions_dir / f"xgboost_{kind}_{split}.csv", index=False)
 
     X = np.concatenate([d[0] for d in data.values()])
     mask = np.concatenate([d[1] for d in data.values()])
@@ -201,9 +207,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("windows_dir", type=Path)
     parser.add_argument("out_json", type=Path)
+    parser.add_argument("--predictions-dir", type=Path, help="also write val/test predictions for scripts/evaluate.py")
     args = parser.parse_args()
     labels = [int(c) for c in json.loads((args.windows_dir / "meta.json").read_text(encoding="utf-8"))["classes"]]
-    results = {kind: run(args.windows_dir, kind, labels) for kind in ("shape", "mean_std")}
+    results = {kind: run(args.windows_dir, kind, labels, args.predictions_dir) for kind in ("shape", "mean_std")}
     args.out_json.parent.mkdir(parents=True, exist_ok=True)
     args.out_json.write_text(json.dumps(results, indent=1), encoding="utf-8")
     for kind, r in results.items():

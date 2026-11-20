@@ -72,3 +72,22 @@ In the `data/windows/` folder (outside git):
 | `{train,val,test}.npz` | `X`: float32 `[N, 6, 180]` with NaN for missing values; `mask`: bool `[N, 6]` (variable present); `y`: int `[N]` (3W class: 0, 2, 4, 7, 8, 9) |
 | `{train,val,test}.csv` | One row per window, in the same order: `window_id`, `instance`, `well`, `label`, `phase`, `start_s`, `event_frac`, `transient_frac` |
 | `meta.json` | 3W commit, variables, class names, window parameters, counts |
+
+## Predictions format
+Every model (baselines, OpenTSLM, perturbed runs) writes its predictions for a split as a CSV with
+one row per window, read by `scripts/evaluate.py`:
+
+| Column | Content |
+|---|---|
+| `window_id` | The id from `{split}.csv` |
+| `prediction` | A 3W class code (0, 2, 4, 7, 8, 9), a class name, or the model's raw answer ("... Answer: Flow instability") |
+
+An answer that maps to no class, and a window without a prediction, count as errors; their share is
+reported. The baselines write theirs with `scripts/baselines.py --predictions-dir results/predictions`.
+
+```powershell
+# Score one model, or compare two on the same windows.
+# Use the validation split while developing, the test split once at the end.
+uv run python scripts/evaluate.py ..\data\windows results\predictions\xgboost_shape_val.csv --split val
+uv run python scripts/evaluate.py ..\data\windows A_test.csv --compare B_test.csv --split test --out results\eval.json
+```
