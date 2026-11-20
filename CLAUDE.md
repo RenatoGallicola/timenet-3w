@@ -21,7 +21,11 @@ change anything already decided.
    push that change right away**. If the block has no issue yet, create one first.
 3. **When a block is done**, close its issue with a short summary, update `docs/STATUS.md`, and
    push.
-4. Record every decision in `docs/DECISIONS.md` with its date and reason.
+4. **When a new task comes up that will not be done right away** (a review comment, a bug found in
+   the data, an idea for later, work for the other member), create an issue for it at once, with
+   no assignee if it is not clear who will do it, and tell the user. That way the other member's
+   session sees it at its next start.
+5. Record every decision in `docs/DECISIONS.md` with its date and reason.
 
 ## Commits and PRs
 - Small, frequent commits in Conventional Commits form (`feat: ...`, `docs: ...`), then push.
