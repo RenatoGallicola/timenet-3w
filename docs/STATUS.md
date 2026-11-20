@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #15 (lead-time analysis). Next: #4, #5 with XGBoost; #3 (perturbation tests) once an OpenTSLM model exists | None |
+| RenatoGallicola (Data and TimeNet) | Next: #4 (random vs well split), #5 (simulated instances) with XGBoost; #3 (perturbation tests) once an OpenTSLM model exists; post 1 | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,11 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (RenatoGallicola): **#15 done** (PR #17): `scripts/lead_time.py` scores windows slid
+  across the event onset (validation only, test frozen). XGBoost shape, class average: flagged as
+  an event 0.18 at -30 min, 0.09 at onset, 0.37 at +15 min (false alarms 0.12). Clear early signal
+  only for class 2 (0.00 before, 0.92 in the first 30 min, 2 instances) and partly class 9; class 4
+  flat, class 7 never detected. Run it for OpenTSLM too before claiming early warning.
 - 2026-11-20 (RenatoGallicola): **#2 done** (PR #16): `scripts/evaluate.py` scores any predictions
   file (`window_id`, `prediction`) the same way, with per-class counts, event-vs-normal detection,
   invalid answers counted as errors, and paired comparisons. Baseline predictions are in
