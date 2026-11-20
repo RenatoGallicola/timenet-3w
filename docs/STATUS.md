@@ -8,10 +8,13 @@ Mancano circa 2 giorni e mezzo: consegna entro **domenica 22 alle 20:00** (scade
 
 | Chi | Sta facendo | Blocchi |
 |---|---|---|
-| RenatoGallicola (Dati e TimeNet) | Aprire la PR del connettore; scrivere il contratto dei dati e l'estrazione delle finestre da 3W, così il training può partire | Ok finale per aprire la PR |
+| RenatoGallicola (Dati e TimeNet) | Scrivere il contratto dei dati e l'estrazione delle finestre da 3W, così il training può partire | Nessuno |
 | ariannabalducci (Modello e demo) | Setup con `docs/SETUP.md`; Modal; OpenTSLM che gira su una GPU A100 di Modal con la demo HAR | Approvazione di Llama 3.2 1B su Hugging Face: chiederla subito |
 
 ## Fatto
+- 2026-11-20: **PR in bozza aperta**: https://github.com/OpenTSLM/TimeNet/pull/833 (2 commit;
+  allineata allo stile dei connettori esistenti). Etichetta `area:connectors` da aggiungere ai
+  maintainer: noi non abbiamo i permessi.
 - 2026-11-17: **connettore 3W completato** nel fork, branch `feature/petrobras-three-w`
   (`datasets/petrobras/three_w/`). ID `petrobras/three-w`. Verificato: ruff, ty (anche Python 3.11),
   11 test, controlli di tutti i connettori, costruzione completa (18 min, 1,1 GB: 2.228 record, 2.228
@@ -24,7 +27,7 @@ Mancano circa 2 giorni e mezzo: consegna entro **domenica 22 alle 20:00** (scade
 - 2026-11-12: registrazione all'hackathon con il pitch su 3W.
 
 ## Da fare a breve
-- PR in bozza verso OpenTSLM/TimeNet (nessun altro team ha aperto PR su 3W al 20 novembre).
+- Segnare la PR #833 come "Ready for review" quando il team è soddisfatto.
 - Contratto dei dati (`docs/DATA_CONTRACT.md`) e finestre pronte per il training.
 - Primo post su X e LinkedIn.
 - Verificare se è arrivato il voucher Nebius.
