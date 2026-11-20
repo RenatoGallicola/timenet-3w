@@ -82,8 +82,10 @@ def iter_parquet(dataset_dir: Path) -> Iterator[tuple[str, int, np.ndarray, np.n
         yield path.stem, int(path.parent.name), values, labels
 
 
-def iter_timenet(registry: Path) -> Iterator[tuple[str, int, np.ndarray, np.ndarray]]:
-    """Yield (instance, event class, values, labels) for each real record of the TimeNet dataset.
+def iter_timenet(registry: Path, provenance: str = "real") -> Iterator[tuple[str, int, np.ndarray, np.ndarray]]:
+    """Yield (instance, event class, values, labels) for each record of the TimeNet dataset.
+
+    Only records of the given provenance (`real`, `simulated` or `drawn`) are read.
 
     The per-second labels are rebuilt from the `event_phase` interval annotations of the
     connector: `normal` is 0, `steady` is the event code, `transient` is 100 + the event code, and
@@ -95,9 +97,9 @@ def iter_timenet(registry: Path) -> Iterator[tuple[str, int, np.ndarray, np.ndar
     us_per_s = 1_000_000
     with timenet.TimeNet(sources=[str(registry)]).open(TIMENET_DATASET) as reader:
         dataset = reader.read()
-        records = [r for r in dataset.records if r.metadata["provenance"] == "real"]
+        records = [r for r in dataset.records if r.metadata["provenance"] == provenance]
         if not records:
-            raise SystemExit(f"No real records found in {TIMENET_DATASET} under {registry}")
+            raise SystemExit(f"No {provenance} records found in {TIMENET_DATASET} under {registry}")
         records.sort(key=lambda r: (int(r.metadata["event_code"]), str(r.metadata["instance"])))
         for record in records:
             event = int(record.metadata["event_code"])
