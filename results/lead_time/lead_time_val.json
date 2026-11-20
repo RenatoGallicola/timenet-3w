@@ -1,0 +1,1207 @@
+{
+ "split": "val",
+ "model": "xgboost_shape",
+ "false_alarm_rate_on_normal_windows": 0.1233,
+ "class_average": [
+  {
+   "offset_min": -30,
+   "classes": 5,
+   "detected": 0.1792,
+   "right_class": 0.0361
+  },
+  {
+   "offset_min": -25,
+   "classes": 5,
+   "detected": 0.1792,
+   "right_class": 0.0386
+  },
+  {
+   "offset_min": -20,
+   "classes": 5,
+   "detected": 0.1768,
+   "right_class": 0.0289
+  },
+  {
+   "offset_min": -15,
+   "classes": 5,
+   "detected": 0.1816,
+   "right_class": 0.0361
+  },
+  {
+   "offset_min": -10,
+   "classes": 5,
+   "detected": 0.1627,
+   "right_class": 0.0458
+  },
+  {
+   "offset_min": -5,
+   "classes": 5,
+   "detected": 0.1936,
+   "right_class": 0.053
+  },
+  {
+   "offset_min": 0,
+   "classes": 5,
+   "detected": 0.0864,
+   "right_class": 0.0458
+  },
+  {
+   "offset_min": 5,
+   "classes": 5,
+   "detected": 0.3221,
+   "right_class": 0.1482
+  },
+  {
+   "offset_min": 10,
+   "classes": 5,
+   "detected": 0.4388,
+   "right_class": 0.2458
+  },
+  {
+   "offset_min": 15,
+   "classes": 5,
+   "detected": 0.3697,
+   "right_class": 0.2458
+  },
+  {
+   "offset_min": 20,
+   "classes": 5,
+   "detected": 0.2982,
+   "right_class": 0.1837
+  },
+  {
+   "offset_min": 25,
+   "classes": 5,
+   "detected": 0.4006,
+   "right_class": 0.1337
+  },
+  {
+   "offset_min": 30,
+   "classes": 5,
+   "detected": 0.3339,
+   "right_class": 0.1337
+  },
+  {
+   "offset_min": 35,
+   "classes": 5,
+   "detected": 0.3482,
+   "right_class": 0.2361
+  },
+  {
+   "offset_min": 40,
+   "classes": 5,
+   "detected": 0.3651,
+   "right_class": 0.1434
+  },
+  {
+   "offset_min": 45,
+   "classes": 5,
+   "detected": 0.3747,
+   "right_class": 0.153
+  },
+  {
+   "offset_min": 50,
+   "classes": 5,
+   "detected": 0.3602,
+   "right_class": 0.1482
+  },
+  {
+   "offset_min": 55,
+   "classes": 5,
+   "detected": 0.3506,
+   "right_class": 0.0361
+  },
+  {
+   "offset_min": 60,
+   "classes": 5,
+   "detected": 0.3578,
+   "right_class": 0.0337
+  },
+  {
+   "offset_min": 65,
+   "classes": 5,
+   "detected": 0.3506,
+   "right_class": 0.0313
+  },
+  {
+   "offset_min": 70,
+   "classes": 4,
+   "detected": 0.2383,
+   "right_class": 0.0301
+  },
+  {
+   "offset_min": 75,
+   "classes": 4,
+   "detected": 0.2142,
+   "right_class": 0.0301
+  },
+  {
+   "offset_min": 80,
+   "classes": 4,
+   "detected": 0.1672,
+   "right_class": 0.0301
+  },
+  {
+   "offset_min": 85,
+   "classes": 4,
+   "detected": 0.1792,
+   "right_class": 0.0422
+  },
+  {
+   "offset_min": 90,
+   "classes": 4,
+   "detected": 0.1852,
+   "right_class": 0.0452
+  },
+  {
+   "offset_min": 95,
+   "classes": 4,
+   "detected": 0.2383,
+   "right_class": 0.0452
+  },
+  {
+   "offset_min": 100,
+   "classes": 4,
+   "detected": 0.2443,
+   "right_class": 0.0452
+  },
+  {
+   "offset_min": 105,
+   "classes": 4,
+   "detected": 0.2473,
+   "right_class": 0.0482
+  },
+  {
+   "offset_min": 110,
+   "classes": 4,
+   "detected": 0.2443,
+   "right_class": 0.0512
+  },
+  {
+   "offset_min": 115,
+   "classes": 4,
+   "detected": 0.2123,
+   "right_class": 0.0663
+  },
+  {
+   "offset_min": 120,
+   "classes": 3,
+   "detected": 0.0833,
+   "right_class": 0.0
+  }
+ ],
+ "per_event": {
+  "2": [
+   {
+    "offset_min": -30,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -25,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -20,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -15,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -10,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -5,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 0,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 5,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 10,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 1.0
+   },
+   {
+    "offset_min": 15,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 1.0
+   },
+   {
+    "offset_min": 20,
+    "instances": 2,
+    "wells": 2,
+    "detected": 0.5,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 25,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 30,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 35,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 1.0
+   },
+   {
+    "offset_min": 40,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 45,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 50,
+    "instances": 2,
+    "wells": 2,
+    "detected": 1.0,
+    "right_class": 0.5
+   },
+   {
+    "offset_min": 55,
+    "instances": 1,
+    "wells": 1,
+    "detected": 1.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 60,
+    "instances": 1,
+    "wells": 1,
+    "detected": 1.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 65,
+    "instances": 1,
+    "wells": 1,
+    "detected": 1.0,
+    "right_class": 0.0
+   }
+  ],
+  "4": [
+   {
+    "offset_min": -30,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": -25,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1928
+   },
+   {
+    "offset_min": -20,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.241,
+    "right_class": 0.1446
+   },
+   {
+    "offset_min": -15,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2651,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": -10,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3133,
+    "right_class": 0.2289
+   },
+   {
+    "offset_min": -5,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3253,
+    "right_class": 0.2651
+   },
+   {
+    "offset_min": 0,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2892,
+    "right_class": 0.2289
+   },
+   {
+    "offset_min": 5,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2771,
+    "right_class": 0.241
+   },
+   {
+    "offset_min": 10,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2771,
+    "right_class": 0.2289
+   },
+   {
+    "offset_min": 15,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2651,
+    "right_class": 0.2289
+   },
+   {
+    "offset_min": 20,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.241,
+    "right_class": 0.1687
+   },
+   {
+    "offset_min": 25,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1687
+   },
+   {
+    "offset_min": 30,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1687
+   },
+   {
+    "offset_min": 35,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.241,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": 40,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3253,
+    "right_class": 0.2169
+   },
+   {
+    "offset_min": 45,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3735,
+    "right_class": 0.2651
+   },
+   {
+    "offset_min": 50,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3012,
+    "right_class": 0.241
+   },
+   {
+    "offset_min": 55,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": 60,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2892,
+    "right_class": 0.1687
+   },
+   {
+    "offset_min": 65,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1566
+   },
+   {
+    "offset_min": 70,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1205
+   },
+   {
+    "offset_min": 75,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.1566,
+    "right_class": 0.1205
+   },
+   {
+    "offset_min": 80,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.1687,
+    "right_class": 0.1205
+   },
+   {
+    "offset_min": 85,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2169,
+    "right_class": 0.1687
+   },
+   {
+    "offset_min": 90,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.241,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": 95,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.253,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": 100,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2771,
+    "right_class": 0.1807
+   },
+   {
+    "offset_min": 105,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2892,
+    "right_class": 0.1928
+   },
+   {
+    "offset_min": 110,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.2771,
+    "right_class": 0.2048
+   },
+   {
+    "offset_min": 115,
+    "instances": 83,
+    "wells": 1,
+    "detected": 0.3494,
+    "right_class": 0.2651
+   }
+  ],
+  "7": [
+   {
+    "offset_min": -30,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -25,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -20,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -15,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -10,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -5,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 0,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 5,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 10,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 15,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 20,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 25,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 30,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 35,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 40,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 45,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 50,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 55,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 60,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 65,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 70,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 75,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 80,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 85,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 90,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 95,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 100,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 105,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 110,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 115,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 120,
+    "instances": 19,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   }
+  ],
+  "8": [
+   {
+    "offset_min": -30,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -25,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -20,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -15,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -10,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -5,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 0,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 5,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 10,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 15,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 20,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.25
+   },
+   {
+    "offset_min": 25,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 30,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 35,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 40,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 45,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 50,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 55,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 60,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 65,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 70,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 75,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 80,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 85,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 90,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 95,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 100,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 105,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 110,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 115,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 120,
+    "instances": 4,
+    "wells": 1,
+    "detected": 0.25,
+    "right_class": 0.0
+   }
+  ],
+  "9": [
+   {
+    "offset_min": -30,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -25,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -20,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -15,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -10,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": -5,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 0,
+    "instances": 7,
+    "wells": 3,
+    "detected": 0.1429,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 5,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.3333,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 10,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.6667,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 15,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.3333,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 20,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 25,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.5,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 30,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.1667,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 35,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 40,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 45,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 50,
+    "instances": 6,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 55,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 60,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 65,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 70,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 75,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 80,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 85,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 90,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 95,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 100,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 105,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 110,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.2,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 115,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   },
+   {
+    "offset_min": 120,
+    "instances": 5,
+    "wells": 2,
+    "detected": 0.0,
+    "right_class": 0.0
+   }
+  ]
+ },
+ "note": "d <= 0: the window ends before the onset, so ideally the rate equals the false-alarm rate."
+}
