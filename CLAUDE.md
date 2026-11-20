@@ -11,6 +11,8 @@ Rispondi sempre in italiano. Codice, commenti e README pubblici in inglese.
 ## Alla fine di ogni sessione
 - Aggiorna `docs/STATUS.md` (cosa è fatto, cosa è in corso, cosa blocca).
 - Commit piccoli e frequenti, poi `git push`.
+- **Nessuna attribuzione a Claude:** niente righe `Co-Authored-By: Claude` nei commit e niente
+  "Generated with Claude Code" nelle PR. Commit e PR risultano solo di chi li fa.
 - Se prendi una decisione, aggiungila a `docs/DECISIONS.md` con data e motivo.
 
 ## Il progetto in breve
