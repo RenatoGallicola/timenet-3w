@@ -9,7 +9,7 @@ time).
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | #3 tool ready (PR #21); its OpenTSLM part waits for a model. Next: README draft (#11), post 1 | OpenTSLM model for the rest of #3 |
-| ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
+| ariannabalducci (Model and demo) | #7 bridge and #8 run 1 done on branches (PRs next); next: decide run 2, then test predictions once | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +25,14 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (ariannabalducci): **OpenTSLM run 1** (#8, branch `issue/8-train-opentslm`):
+  `scripts/opentslm_modal.py` trains on Modal from `OpenTSLM/llama-3.2-1b-har-sp` with the bridge of
+  #7 (`scripts/opentslm_bridge.py`, branch `issue/7-opentslm-bridge`). **Validation macro-F1 0.510**
+  after epoch 1 (XGBoost shape 0.221 on the same windows; paired bootstrap over instances +0.29, CI
+  0.18-0.37); per class 0: 0.57, 2: 0.62, 4: 0.95, 7: 0.25, 8: 0.68, **9: 0.00**; false alarms 0.20
+  (XGBoost 0.12). Epoch 2 overfits (0.36). About 12 min per epoch on an A100, within the free
+  credits. Checkpoint in the private HF repo `timenet-3w/timenet-3w-opentslm`. Test not run yet.
+  **RenatoGallicola: the model is ready for #3** (how to run it: comment on #3).
 - 2026-11-20 (RenatoGallicola): **#3 tool ready** (PR #21; issue still open): `scripts/perturb.py`
   writes perturbed window folders (time shuffle, noise with the same statistics, signal or statistics
   from another class, no statistics) with the prompt statistics in `stats_mean`/`stats_std`. Checked
