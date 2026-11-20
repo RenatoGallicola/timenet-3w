@@ -86,7 +86,18 @@ Check: the `dataset` folder must hold 10 subfolders (0-9) and 2,228 `.parquet` f
 path in `.env` as `THREEW_DATASET_DIR`, for example
 `C:\Users\<you>\Desktop\TimeNet\data\3w\dataset`.
 
-## 7. Start Claude Code
+## 7. Build the TimeNet dataset and the windows
+The training windows come from the `petrobras/three-w` TimeNet dataset built by our connector. Build
+it once (it downloads 3W again from the pinned URLs: about 20 minutes, 1.1 GB on disk), then cut the
+windows:
+```powershell
+cd $HOME\Desktop\TimeNet\timenet-3w
+uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --local-registry ..\registry
+uv run python scripts/make_windows.py ..\registry ..\data\windows --splits splits/wells_connector.json
+```
+See `docs/DATA_CONTRACT.md` for the window format.
+
+## 8. Start Claude Code
 Open the `timenet-3w` folder in VS Code and open Claude Code. The first time, Claude Code may ask
 you to approve the project settings: they hold the `SessionStart` hook that pulls the repo and shows
 the status and the open issues. Approve them.
@@ -94,7 +105,7 @@ the status and the open issues. Approve them.
 Claude finds the whole context in `CLAUDE.md`: deadlines, constraints, decisions, verified facts,
 and the "claim before you work" rule.
 
-## 8. Rules of every session
+## 9. Rules of every session
 - **Claim before you work:** every block of work is a GitHub issue. Assign it to yourself and
   update `docs/STATUS.md` on `main` before starting, then push right away.
 - **Work on a branch:** `issue/<number>-<short-name>`, created from an up-to-date `main`. Small,

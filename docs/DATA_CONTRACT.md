@@ -3,9 +3,19 @@
 The common format between the "Data and TimeNet" part and the "Model and demo" part.
 Approved on 2026-11-20. Every change must be agreed and recorded in `docs/DECISIONS.md`.
 
-The script that implements it is `scripts/make_windows.py`: it reads the 3W Parquet files (commit
-`c86cc7c70063646910be7292de8a54a6fb2a8399`) and writes the windows. The same format will be produced
-by reading from TimeNet, with the connector of PR #833.
+The script that implements it is `scripts/make_windows.py`. By default it reads the
+`petrobras/three-w` dataset that the connector of
+[OpenTSLM/TimeNet PR #833](https://github.com/OpenTSLM/TimeNet/pull/833) builds from 3W (commit
+`c86cc7c70063646910be7292de8a54a6fb2a8399`), so the model trains on data that comes from TimeNet.
+With `--source parquet` it reads the 3W Parquet files directly. `scripts/compare_windows.py` checked
+on 2026-11-20 that both sources give the same 18,737 windows, value for value.
+
+```powershell
+# Build the TimeNet dataset once (downloads 3W, about 20 minutes, 1.1 GB)
+uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --local-registry ..\registry
+# Cut the windows from it, with the connector's split
+uv run python scripts/make_windows.py ..\registry ..\data\windows --splits splits/wells_connector.json
+```
 
 ## Main evaluation
 
