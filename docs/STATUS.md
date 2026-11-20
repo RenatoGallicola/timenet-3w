@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #2 (evaluation script). Next: #3 (perturbation tests) once a model exists, #15, #4, #5 | None |
+| RenatoGallicola (Data and TimeNet) | Next: #15 (lead-time analysis), #4, #5 with XGBoost; #3 (perturbation tests) once an OpenTSLM model exists | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,11 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-20 (RenatoGallicola): **#2 done** (PR #16): `scripts/evaluate.py` scores any predictions
+  file (`window_id`, `prediction`) the same way, with per-class counts, event-vs-normal detection,
+  invalid answers counted as errors, and paired comparisons. Baseline predictions are in
+  `results/predictions/`. **ariannabalducci: write OpenTSLM predictions in this format** (see
+  `docs/DATA_CONTRACT.md`).
 - 2026-11-20 (RenatoGallicola): **#12 done** (PR #14): baselines rerun on the TimeNet windows with
   the connector split. Macro-F1 shape 0.40 test / 0.22 val / 0.38 ± 0.13 CV; mean_std 0.26 test /
   0.16 val / 0.37 ± 0.15 CV. In the test split classes 2, 7 and 9 come from one well each and class
