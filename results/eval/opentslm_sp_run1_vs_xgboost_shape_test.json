@@ -1,0 +1,304 @@
+{
+ "split": "test",
+ "predictions": "results\\predictions\\opentslm_sp_run1_test.csv",
+ "report": {
+  "all_windows": {
+   "windows": 3220,
+   "instances": 190,
+   "wells": 8,
+   "macro_f1_6_classes": 0.3486,
+   "balanced_accuracy": 0.458,
+   "accuracy": 0.2646,
+   "invalid_share": 0.0,
+   "event_detection": {
+    "event_recall": 0.3682,
+    "false_alarm_rate": 0.5939
+   },
+   "per_class": {
+    "0": {
+     "name": "Normal operation",
+     "windows": 1805,
+     "instances": 130,
+     "wells": 8,
+     "precision": 0.4505,
+     "recall": 0.4061,
+     "f1": 0.4272
+    },
+    "2": {
+     "name": "Spurious closure of DHSV",
+     "windows": 55,
+     "instances": 3,
+     "wells": 1,
+     "precision": 1.0,
+     "recall": 0.7818,
+     "f1": 0.8776
+    },
+    "4": {
+     "name": "Flow instability",
+     "windows": 1119,
+     "instances": 59,
+     "wells": 2,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0
+    },
+    "7": {
+     "name": "Scaling in PCK",
+     "windows": 160,
+     "instances": 8,
+     "wells": 1,
+     "precision": 0.0131,
+     "recall": 0.1062,
+     "f1": 0.0234
+    },
+    "8": {
+     "name": "Hydrate in production line",
+     "windows": 40,
+     "instances": 2,
+     "wells": 2,
+     "precision": 0.1832,
+     "recall": 0.6,
+     "f1": 0.2807
+    },
+    "9": {
+     "name": "Hydrate in service line",
+     "windows": 41,
+     "instances": 3,
+     "wells": 1,
+     "precision": 0.3365,
+     "recall": 0.8537,
+     "f1": 0.4828
+    }
+   }
+  },
+  "transient_phase_windows": {
+   "windows": 285,
+   "instances": 16,
+   "wells": 5,
+   "macro_f1_6_classes": 0.4369,
+   "balanced_accuracy": 0.5907,
+   "accuracy": 0.393,
+   "invalid_share": 0.0,
+   "event_detection": {
+    "event_recall": 0.4596,
+    "false_alarm_rate": null
+   },
+   "per_class": {
+    "0": {
+     "name": "Normal operation",
+     "windows": 0,
+     "instances": 0,
+     "wells": 0,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0
+    },
+    "2": {
+     "name": "Spurious closure of DHSV",
+     "windows": 48,
+     "instances": 3,
+     "wells": 1,
+     "precision": 1.0,
+     "recall": 0.7917,
+     "f1": 0.8837
+    },
+    "4": {
+     "name": "Flow instability",
+     "windows": 0,
+     "instances": 0,
+     "wells": 0,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f1": 0.0
+    },
+    "7": {
+     "name": "Scaling in PCK",
+     "windows": 160,
+     "instances": 8,
+     "wells": 1,
+     "precision": 0.8095,
+     "recall": 0.1062,
+     "f1": 0.1878
+    },
+    "8": {
+     "name": "Hydrate in production line",
+     "windows": 36,
+     "instances": 2,
+     "wells": 2,
+     "precision": 0.6471,
+     "recall": 0.6111,
+     "f1": 0.6286
+    },
+    "9": {
+     "name": "Hydrate in service line",
+     "windows": 41,
+     "instances": 3,
+     "wells": 1,
+     "precision": 1.0,
+     "recall": 0.8537,
+     "f1": 0.9211
+    }
+   }
+  }
+ },
+ "compared_with": {
+  "predictions": "results\\predictions\\xgboost_shape_test.csv",
+  "report": {
+   "all_windows": {
+    "windows": 3220,
+    "instances": 190,
+    "wells": 8,
+    "macro_f1_6_classes": 0.4028,
+    "balanced_accuracy": 0.4,
+    "accuracy": 0.6571,
+    "invalid_share": 0.0,
+    "event_detection": {
+     "event_recall": 0.3413,
+     "false_alarm_rate": 0.0875
+    },
+    "per_class": {
+     "0": {
+      "name": "Normal operation",
+      "windows": 1805,
+      "instances": 130,
+      "wells": 8,
+      "precision": 0.6386,
+      "recall": 0.9125,
+      "f1": 0.7514
+     },
+     "2": {
+      "name": "Spurious closure of DHSV",
+      "windows": 55,
+      "instances": 3,
+      "wells": 1,
+      "precision": 0.9821,
+      "recall": 1.0,
+      "f1": 0.991
+     },
+     "4": {
+      "name": "Flow instability",
+      "windows": 1119,
+      "instances": 59,
+      "wells": 2,
+      "precision": 0.8453,
+      "recall": 0.3566,
+      "f1": 0.5016
+     },
+     "7": {
+      "name": "Scaling in PCK",
+      "windows": 160,
+      "instances": 8,
+      "wells": 1,
+      "precision": 0.134,
+      "recall": 0.0813,
+      "f1": 0.1012
+     },
+     "8": {
+      "name": "Hydrate in production line",
+      "windows": 40,
+      "instances": 2,
+      "wells": 2,
+      "precision": 0.125,
+      "recall": 0.05,
+      "f1": 0.0714
+     },
+     "9": {
+      "name": "Hydrate in service line",
+      "windows": 41,
+      "instances": 3,
+      "wells": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     }
+    }
+   },
+   "transient_phase_windows": {
+    "windows": 285,
+    "instances": 16,
+    "wells": 5,
+    "macro_f1_6_classes": 0.2071,
+    "balanced_accuracy": 0.2842,
+    "accuracy": 0.2211,
+    "invalid_share": 0.0,
+    "event_detection": {
+     "event_recall": 0.2632,
+     "false_alarm_rate": null
+    },
+    "per_class": {
+     "0": {
+      "name": "Normal operation",
+      "windows": 0,
+      "instances": 0,
+      "wells": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "2": {
+      "name": "Spurious closure of DHSV",
+      "windows": 48,
+      "instances": 3,
+      "wells": 1,
+      "precision": 0.9796,
+      "recall": 1.0,
+      "f1": 0.9897
+     },
+     "4": {
+      "name": "Flow instability",
+      "windows": 0,
+      "instances": 0,
+      "wells": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     },
+     "7": {
+      "name": "Scaling in PCK",
+      "windows": 160,
+      "instances": 8,
+      "wells": 1,
+      "precision": 0.8125,
+      "recall": 0.0813,
+      "f1": 0.1477
+     },
+     "8": {
+      "name": "Hydrate in production line",
+      "windows": 36,
+      "instances": 2,
+      "wells": 2,
+      "precision": 1.0,
+      "recall": 0.0556,
+      "f1": 0.1053
+     },
+     "9": {
+      "name": "Hydrate in service line",
+      "windows": 41,
+      "instances": 3,
+      "wells": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+     }
+    }
+   }
+  }
+ },
+ "paired_comparison": {
+  "paired_bootstrap_over_instances": {
+   "macro_f1_difference": -0.0542,
+   "ci95": [
+    -0.1637,
+    0.0161
+   ],
+   "share_of_resamples_a_better": 0.067,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  },
+  "mcnemar_exact": {
+   "only_a_correct": 161,
+   "only_b_correct": 1425,
+   "p_value": 0.0,
+   "note": "Treats windows as independent; overlapping windows of one instance are not, so read the p-value as optimistic."
+  }
+ }
+}
