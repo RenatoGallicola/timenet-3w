@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #12 (rerun the baselines with the connector split on the TimeNet windows). Next: #2 (evaluation script). An external review of the evaluation plan is running | None |
+| RenatoGallicola (Data and TimeNet) | Next: apply the external review of the evaluation plan (to be agreed), then #2 (evaluation script) | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,10 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-20 (RenatoGallicola): **#12 done** (PR #14): baselines rerun on the TimeNet windows with
+  the connector split. Macro-F1 shape 0.40 test / 0.22 val / 0.38 ± 0.13 CV; mean_std 0.26 test /
+  0.16 val / 0.37 ± 0.15 CV. In the test split classes 2, 7 and 9 come from one well each and class
+  8 from two, so per-class numbers rest on 1-3 events.
 - 2026-11-20 (RenatoGallicola): **#1 done** (PR #13): `scripts/make_windows.py` reads the
   `petrobras/three-w` TimeNet dataset by default; `scripts/compare_windows.py` confirms the windows
   are identical to the Parquet ones (18,737 windows with the connector split: 12,827 / 2,690 /
