@@ -21,30 +21,41 @@ Anyone starting on a new computer follows `docs/SETUP.md`.
 The two parts run in parallel. Their contact point is `docs/DATA_CONTRACT.md`.
 
 ## Priority order
+Updated after the external review of the evaluation plan (2026-11-20).
+
 1. **Must have**
-   - Connector PR: event classification, transient intervals as annotations, real/simulated/drawn
-     provenance, well id, split by well. *Done: PR #833.*
-   - Windows read from the TimeNet dataset built by the connector, identical to the windows read
-     from the Parquet files.
-   - One trained model (OpenTSLM SoftPrompt, Llama 3.2 1B) on the classes with enough real
-     instances.
-   - Evaluation on wells held out from training.
-   - Baselines: XGBoost on shape features and a classifier that sees only mean and standard
-     deviation. *Done.*
-   - Explanations built from computed features, checked automatically.
-   - One perturbation test (time-shuffled signal).
-   - Demo with precomputed examples, README, posts, submission.
+   - Connector PR. *Done: PR #833.*
+   - Windows read from the TimeNet dataset. *Done: #1.*
+   - Baselines on the connector split. *Done: #12.*
+   - Evaluation script with count-aware, paired reporting and event-vs-normal detection (#2).
+   - OpenTSLM run 1 (#7, #8): SoftPrompt from an existing `-sp` checkpoint, label-only answers,
+     sensor dropout, balanced sampling. Settings chosen without the test wells.
+   - Time-shuffle perturbation on the test windows, next to the mean/std baseline (#3).
+   - Demo with precomputed examples (#10), README (#11), posts, submission.
 2. **Then**
-   - Flamingo and a comparison of the two architectures.
-   - Training on simulated instances and testing on real ones for the rare classes.
-   - All perturbation tests (signal swapped across classes, statistics removed).
-   - How early events are recognized (metrics on transient windows).
-   - Random split against split by well.
-   - A large LLM without fine-tuning as a reference.
+   - Lead-time analysis around event onset (#15), needed to claim early warning.
+   - Random split vs split by well (#4) and baselines with simulated instances (#5): cheap, good
+     charts for the posts.
+   - The other perturbation tests (signal swapped across classes, statistics removed) (#3).
+   - Template rationales whose cited numbers are checked automatically (#9); a second training run
+     with rationales if run 1 is done by Saturday evening.
 3. **If time allows**
+   - Flamingo and a comparison of the two architectures.
+   - A large LLM without fine-tuning as a reference.
+   - Training on simulated instances and testing on real ones for the rare classes.
    - Temporal localization as a separate task.
-   - Explanations rewritten by an open model.
-   - Live GPU demo, polished video.
+   - Explanations rewritten by an open model; live GPU demo; polished video.
+
+## Claims
+Safe: a leakage-free benchmark held out by well on TimeNet; classical baselines around 0.35-0.40
+macro-F1 with large variance across wells; the sensor-presence shortcut found and fixed; mean and
+standard deviation carry most of the signal; event detection with its false-alarm rate; OpenTSLM's
+numbers with per-class counts; the perturbation result, whichever way it goes.
+
+Avoid: "early warning" without #15; "OpenTSLM beats the baselines" without a paired test; any claim
+about classes 7 or 9 generalizing (one test well each); comparing directly with the 35.1% of arXiv
+2608.04041 (different protocol); calling the explanations causal (at most: the numbers they cite
+are correct).
 
 ## Schedule
 | Day | Data and TimeNet | Model and demo |
