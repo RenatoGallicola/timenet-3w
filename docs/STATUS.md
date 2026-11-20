@@ -13,7 +13,7 @@ Mancano circa 2 giorni: consegna entro **domenica 22 alle 20:00** (scadenza vera
 
 | Chi | Sta facendo | Blocchi |
 |---|---|---|
-| RenatoGallicola (Dati e TimeNet) | Decidere con ariannabalducci lo split (sotto) e i ritocchi alla PR #833; poi, a scelta: baseline con i casi simulati nel training, confronto split casuale contro split per pozzo, test di perturbazione | Nessuno |
+| RenatoGallicola (Dati e TimeNet) | **In corso:** `make_windows.py` che legge il dataset TimeNet costruito dal connettore invece dei Parquet, con verifica che le finestre coincidano. Poi: script di valutazione, test di perturbazione, split casuale contro split per pozzo, baseline con i casi simulati | Nessuno |
 | ariannabalducci (Modello e demo) | Collegamento delle finestre a OpenTSLM; training su Modal | Nessuno: accesso a Llama 3.2 1B già concesso |
 
 ## Da decidere subito (insieme)
@@ -47,6 +47,10 @@ Mancano circa 2 giorni: consegna entro **domenica 22 alle 20:00** (scadenza vera
      `physionet/sleep_edfx`.
 
 ## Fatto
+- 2026-11-20 (RenatoGallicola): **ritocchi alla PR #833 fatti** (3 commit, segnata "Ready for
+  review"): nessuna ora di inizio assoluta (3W non dichiara il fuso orario, l'inizio resta testo in
+  `metadata["start"]`), scheda con `source_revision`, `license_url` e citazione della 2.0.0,
+  `README.md` del connettore. **Split deciso: quello del connettore.**
 - 2026-11-20 (ariannabalducci): **contratto dei dati** approvato e implementato
   (`docs/DATA_CONTRACT.md`, `scripts/make_windows.py`): 18.737 finestre di 30 minuti da 39 pozzi
   reali, in circa 40 secondi. Il pozzo `WELL-00008` non ha finestre delle classi principali.
