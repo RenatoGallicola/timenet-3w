@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #12 (rerun the baselines with the connector split), then #2 (evaluation script) | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #12 (rerun the baselines with the connector split on the TimeNet windows). Next: #2 (evaluation script). An external review of the evaluation plan is running | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
