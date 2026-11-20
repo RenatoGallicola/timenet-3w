@@ -23,3 +23,4 @@ One row per decision: date, decision, reason. Newest at the bottom.
 | 2026-11-20 | Training windows are read from the TimeNet dataset, not from the Parquet files | The pitch and the "Data and TimeNet" criterion require that the model trains from TimeNet |
 | 2026-11-20 | Coordination: GitHub issues for repo work, claimed before work starts; posts and submission tracked in `docs/STATUS.md`; a `SessionStart` hook pulls and shows status and issues | Avoid the overlap of 2026-11-20, when the same blocks were done twice |
 | 2026-11-20 | The whole repository is in English | Public repository read by the judges |
+| 2026-11-20 | Code and results of each issue on an `issue/<number>-<name>` branch, merged into `main` by its author with a PR that says `Closes #<number>`; claims and decisions committed directly on `main` | Keep `main` working and the history tidy, while claims stay visible at once |

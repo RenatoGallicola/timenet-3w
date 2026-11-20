@@ -6,8 +6,9 @@ Shared context for the Claude Code sessions of both team members.
   comments, docs, commit messages, issues, PRs) is in **English**.
 
 ## At the start of every session
-A `SessionStart` hook (`.claude/hooks/session_start.py`) runs `git pull --ff-only` and shows you the
-"Now" and "Final deliverables" sections of `docs/STATUS.md` plus the open GitHub issues. If the
+A `SessionStart` hook (`.claude/hooks/session_start.py`) fetches the remote, fast-forwards `main`
+if it is checked out, and shows you the "Now" and "Final deliverables" sections of
+`docs/STATUS.md` on `origin/main` plus the open GitHub issues. If the
 hook output is missing, do the same by hand. Then read `docs/DECISIONS.md` before proposing to
 change anything already decided.
 
@@ -26,6 +27,18 @@ change anything already decided.
    no assignee if it is not clear who will do it, and tell the user. That way the other member's
    session sees it at its next start.
 5. Record every decision in `docs/DECISIONS.md` with its date and reason.
+
+## Branches
+- **Code and results of an issue** go on a branch named `issue/<number>-<short-name>` (for example
+  `issue/3-perturbation-tests`), created from an up-to-date `main`. When the block is done, open a PR
+  to `main` with `Closes #<number>` in the description, so GitHub closes the issue on merge. No
+  review is required: whoever did the work merges it (squash merge), so nobody waits on the other.
+  Before opening the PR, bring the branch up to date with `origin/main`.
+- **Claims and decisions** (`docs/STATUS.md`, `docs/DECISIONS.md`) are committed **directly on
+  `main`** and pushed at once, so the other member sees them right away. To do that while on an
+  issue branch, switch to `main`, pull, commit, push, and switch back.
+- The `SessionStart` hook fast-forwards `main` only when `main` is checked out, and always shows
+  the status as it is on `origin/main`.
 
 ## Commits and PRs
 - Small, frequent commits in Conventional Commits form (`feat: ...`, `docs: ...`), then push.

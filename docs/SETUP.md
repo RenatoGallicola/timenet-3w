@@ -96,8 +96,9 @@ and the "claim before you work" rule.
 
 ## 8. Rules of every session
 - **Claim before you work:** every block of work is a GitHub issue. Assign it to yourself and
-  update `docs/STATUS.md` before starting, then push right away.
-- **During the work:** small, frequent commits in the form `type: description`
-  (e.g. `feat: add 3W window loader`).
-- **At the end:** close the issue, update `docs/STATUS.md`, `git push`.
+  update `docs/STATUS.md` on `main` before starting, then push right away.
+- **Work on a branch:** `issue/<number>-<short-name>`, created from an up-to-date `main`. Small,
+  frequent commits in the form `type: description` (e.g. `feat: add 3W window loader`).
+- **At the end:** open a PR to `main` with `Closes #<number>`, merge it yourself (squash), then
+  update `docs/STATUS.md` on `main` and push.
 - **Decisions:** record them in `docs/DECISIONS.md` with date and reason.
