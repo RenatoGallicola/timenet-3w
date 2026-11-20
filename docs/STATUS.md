@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: apply the external review of the evaluation plan (to be agreed), then #2 (evaluation script) | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #2 (evaluation script). Next: #3 (perturbation tests) once a model exists, #15, #4, #5 | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
