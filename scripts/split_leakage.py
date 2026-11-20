@@ -80,13 +80,15 @@ def plot(summary: dict, path: Path) -> None:
     stds = [summary["schemes"][n]["macro_f1_std"] for n in names]
     fig, ax = plt.subplots(figsize=(6.5, 4))
     bars = ax.bar(names, means, yerr=stds, capsize=6, color=["#c44e52", "#dd8452", "#4c72b0"])
-    for bar, mean in zip(bars, means):
-        ax.text(bar.get_x() + bar.get_width() / 2, mean + 0.02, f"{mean:.2f}", ha="center")
+    for bar, mean, std in zip(bars, means, stds):
+        # Above the error bar, so the label never overlaps it.
+        ax.text(bar.get_x() + bar.get_width() / 2, mean + std + 0.02, f"{mean:.2f} ± {std:.2f}", ha="center")
     ax.set_ylabel("macro-F1 over 6 classes (5-fold CV)")
-    ax.set_ylim(0, 1)
+    ax.set_ylim(0, 1.05)
     ax.set_title("Same model, same windows: how the split changes the score")
     ax.grid(axis="y", alpha=0.3)
-    fig.tight_layout()
+    fig.text(0.5, 0.01, "Error bars: standard deviation over the 5 folds.", ha="center", fontsize=8, color="grey")
+    fig.tight_layout(rect=(0, 0.04, 1, 1))
     fig.savefig(path, dpi=150)
 
 
@@ -94,7 +96,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("windows_dir", type=Path)
     parser.add_argument("out_dir", type=Path)
+    parser.add_argument("--plot-only", action="store_true", help="redraw the chart from the saved JSON")
     args = parser.parse_args()
+    if args.plot_only:
+        summary = json.loads((args.out_dir / "split_leakage.json").read_text(encoding="utf-8"))
+        plot(summary, args.out_dir / "split_leakage.png")
+        return
     summary = run(args.windows_dir)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     (args.out_dir / "split_leakage.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
