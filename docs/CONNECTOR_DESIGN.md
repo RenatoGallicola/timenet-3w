@@ -1,135 +1,84 @@
-# Progetto del connettore `petrobras/3w`
+# Design of the `petrobras/three-w` connector
 
-**Stato: approvato il 2026-11-17** (tutte e 5 le proposte). Implementato nel fork, branch
-`feature/petrobras-three-w`, cartella `packages/timenet-connectors/src/timenet_connectors/datasets/petrobras/three_w/`.
+**Status:** approved on 2026-11-17 and implemented in the fork, branch `feature/petrobras-three-w`,
+folder `packages/timenet-connectors/src/timenet_connectors/datasets/petrobras/three_w/`. Submitted
+as [PR #833](https://github.com/OpenTSLM/TimeNet/pull/833). The connector's own `README.md` states
+the final decisions with the numbers measured on the release; this document records the design and
+the choices made on the way.
 
-Basato su: 3W v2.0.0 al commit `c86cc7c70063646910be7292de8a54a6fb2a8399`, l'esplorazione in
-`docs/3W_EXPLORATION.md` e i connettori esistenti di TimeNet (soprattutto `physionet/sleep-edfx`,
-che come 3W ha registrazioni lunghe con etichette per intervallo).
+Based on 3W v2.0.0 at commit `c86cc7c70063646910be7292de8a54a6fb2a8399`, the exploration in
+`docs/3W_EXPLORATION.md`, and the existing TimeNet connectors (mainly `physionet/sleep-edfx`, which
+like 3W has long recordings with interval labels).
 
----
-
-## 1. Identità
-| Voce | Proposta |
+## 1. Identity
+| Item | Value |
 |---|---|
-| ID | `petrobras/three-w`, cartella `datasets/petrobras/three_w/`. TimeNet ricava il nome della cartella dall'ID (minuscolo, trattini → underscore): `petrobras/3w` darebbe una cartella `3w`, che non è un nome di modulo Python importabile |
-| Versione | `1.0.0` (versione della conversione TimeNet; la versione di 3W, 2.0.0, va nella descrizione) |
-| Licenza | `CC-BY-4.0` |
-| Domini | `industrial`, `energy` |
-| Tag | `oil-and-gas`, `fault-detection`, `anomaly-detection`, `multivariate`, `petrobras` |
-| `source_url` | https://github.com/petrobras/3W |
+| Id | `petrobras/three-w`, folder `datasets/petrobras/three_w/`. TimeNet derives the folder name from the id (lowercase, hyphens to underscores): `petrobras/3w` would give a folder `3w`, which is not an importable Python module |
+| Version | `1.0.0` (version of the TimeNet conversion; the 3W version, 2.0.0, is in the description) |
+| License | `CC-BY-4.0`, with `license_url` pointing to `dataset/LICENSE-CC-BY` of the release |
+| Domains | `industrial`, `energy` |
+| Card | `source_url`, `source_revision` (the pinned commit) and the citation of the 2.0.0 paper |
 
-## 2. Sorgente e download
-- Nessuna base esistente fa al caso nostro (non è Hugging Face né PhysioNet): sottoclasse diretta
-  di `BaseConnector`.
-- I 2.228 file Parquet sono in git senza LFS, quindi ognuno ha un URL fisso al commit:
-  `https://raw.githubusercontent.com/petrobras/3W/<commit>/dataset/<classe>/<file>.parquet`.
-- **Manifest** `files.csv` nella cartella del connettore: percorso, dimensione e sha256 di ogni
-  file, generato una volta da uno script e committato. `download` passa i 2.228 `Artifact` a
-  `download_files`, che li scarica in parallelo e verifica ogni sha256.
-- `download` fa solo I/O; `convert` legge i file senza rete, e i valori dei segnali si caricano in
-  modo pigro (*lazy*), mai tutti in memoria.
+## 2. Source and download
+- No existing base fits (neither Hugging Face nor PhysioNet): a direct `BaseConnector` subclass.
+- The 2,228 Parquet files are in plain git without LFS, so each has a commit-pinned URL:
+  `https://raw.githubusercontent.com/petrobras/3W/<commit>/dataset/<class>/<file>.parquet`.
+- **Manifest** `files.csv` in the connector folder: path, size and SHA-256 of every file, generated
+  once by `generate_manifest.py` and committed. `download` passes the 2,228 `Artifact`s to
+  `download_files`, which fetches them in parallel and checks every SHA-256.
+- `download` does I/O only; `convert` reads the files without the network, and signal values load
+  lazily.
 
-## 3. Struttura: un record per caso
+## 3. Structure: one record per instance
 
-| Elemento TimeNet | Da cosa viene in 3W |
+| TimeNet element | From 3W |
 |---|---|
-| **Record** | Un file Parquet (un caso). Durata = numero di righe, a 1 Hz (verificato: tutti i 2.228 file hanno passo di 1 s esatto) |
-| `Record.metadata` | `instance` (nome del file), `well` (es. `WELL-00002`, solo per i reali), `provenance` (`real` / `simulated` / `drawn`), `event_class` (0-9), `start_time` (primo timestamp) |
-| **Source** | Gruppi di sensori per posizione fisica (vedi sotto) |
-| **Signal** | Una variabile di 3W, con unità di misura. Asse regolare a 1 Hz |
-| **Annotazioni sugli intervalli** | Le fasi dell'evento ricavate dalla colonna `class` |
-| **Annotazioni sul record** | Provenienza, pozzo, tipo di evento |
-| **Task** | Classificazione del tipo di evento e localizzazione della fase transitoria |
+| **Record** | One Parquet file (one instance), sampled at exactly 1 Hz (checked) |
+| `Record.metadata` | `instance`, `well` (real only), `provenance` (`real` / `simulated` / `drawn`), `event_code` (0-9), `start` (first timestamp as text: 3W states no time zone, so there is no absolute start time) |
+| **Source** | Sensor groups by measuring point |
+| **Signal** | One 3W variable, named after its column, with its `dataset.ini` description in the metadata |
+| **Interval annotations** | The event phases from the `class` column |
+| **Record annotations** | Provenance, well, event type |
+| **Tasks** | Event-type classification and localization of the transient phase |
 
-### Source (gruppi per posizione)
-| Source | Variabili | Unità |
-|---|---|---|
-| Fondo pozzo (PDG) | `P-PDG`, `T-PDG` | Pa, °C |
-| Albero di Natale sottomarino | `P-TPT`, `T-TPT`, `PT-P`, `P-ANULAR` | Pa, °C |
-| Valvola di produzione (PCK) | `P-MON-CKP`, `P-JUS-CKP`, `T-MON-CKP`, `T-JUS-CKP`, `ABER-CKP`, `P-MON-SDV-P` | Pa, °C, % |
-| Linea del gas lift | `P-MON-CKGL`, `P-JUS-CKGL`, `ABER-CKGL`, `QGL` | Pa, %, m³/s |
-| Linea di servizio | `P-JUS-BS`, `QBS` | Pa, m³/s |
-| Stati delle valvole | `ESTADO-DHSV`, `ESTADO-M1`, `ESTADO-M2`, `ESTADO-PXO`, `ESTADO-SDV-GL`, `ESTADO-SDV-P`, `ESTADO-W1`, `ESTADO-W2`, `ESTADO-XO` | adimensionale (0 / 0,5 / 1) |
-| Stato del pozzo | `state` (codici 0-8) | adimensionale |
+The signals share six specs by quantity: `pressure`, `temperature`, `flow_rate`, `valve_opening`,
+`valve_state`, `well_status`.
 
-### Dati mancanti (regola del repo: mai riempire)
-- Una variabile **sempre vuota** in un caso non diventa un segnale di quel record: per quel pozzo
-  il sensore non esiste.
-- Una variabile **vuota solo in parte** diventa un segnale con
-  `MissingValues(reason=NOT_RECORDED)`; i null restano null.
-- Una variabile **costante per tutto il caso** (es. `P-PDG` fisso a 0 nell'esempio sotto) resta
-  così com'è, con un'annotazione sul segnale `constant_value=true`, perché chi la usa sappia che è
-  probabilmente un sensore bloccato. Non la togliamo e non la correggiamo.
+### Missing data (repo rule: never fill)
+- A variable **empty for a whole instance** becomes no signal of that record: that well has no such
+  sensor.
+- A variable **partly empty** becomes a signal with `MissingValues(reason=NOT_RECORDED)`; nulls stay
+  null.
+- A variable **constant for a whole instance** (for example `P-PDG` stuck at 0) stays as it is, with
+  a `constant_value` annotation on the signal, because it usually means a stuck sensor.
 
-### Fasi dell'evento (dalla colonna `class`)
-Ogni tratto continuo con la stessa etichetta diventa un'annotazione su intervallo:
-
-| Valore di `class` | Annotazione |
+### Event phases (from the `class` column)
+| `class` value | Annotation |
 |---|---|
 | 0 | `event_phase = normal` |
-| 1-9 | `event_phase = steady`, `event_type = <nome dell'evento>` |
-| 101-109 | `event_phase = transient`, `event_type = <nome dell'evento>` |
-| vuoto | nessuna annotazione (circa il 5% degli istanti) |
+| 1-9 | `event_phase = steady` |
+| 101-109 | `event_phase = transient` |
+| empty | no annotation (about 5% of the seconds) |
 
-## 4. Task
+## 4. Tasks
+| Task | One per | Answer |
+|---|---|---|
+| `ClassificationTask` "event type" | Every instance (2,228) | One of the 10 labels of `dataset.ini` |
+| `TemporalLocalizationTask` "transient phase" | Every instance whose event has a transient phase (1,142) | The transient intervals, `EXHAUSTIVE` mode |
 
-| Task | Uno per | Risposta | Note |
-|---|---|---|---|
-| `ClassificationTask` "tipo di evento" | Ogni caso (2.228) | Una delle 10 etichette (`Normal operation`, `Abrupt increase of BSW`, ...) | `LabelSet` con le descrizioni di `dataset.ini` |
-| `TemporalLocalizationTask` "fase transitoria" | Ogni caso con un evento che ha fase transitoria | Gli intervalli transitori | Modalità `EXHAUSTIVE`: è la base per l'allerta precoce |
-
-Le **finestre** (30-60 minuti per il training) **non** stanno nel connettore: sono una scelta del
-nostro progetto, definita in `docs/DATA_CONTRACT.md`. Il connettore resta fedele ai dati originali,
-come fanno gli altri connettori di TimeNet.
+The **windows** for training are not in the connector: they are a choice of this project, defined
+in `docs/DATA_CONTRACT.md`. The connector stays faithful to the original data, like the other
+TimeNet connectors.
 
 ## 5. Split
-- **Casi reali:** split per pozzo (nessun pozzo in più di uno split) con lo `StratifiedSplitter`
-  di TimeNet, stratificato per classe e raggruppato per pozzo: train / validation / test.
-- **Casi simulati e disegnati:** sempre in train, perché non vengono da pozzi reali.
-- **Limite da dichiarare:** le classi 3 e 6 hanno solo 2 pozzi reali, quindi potrebbero mancare
-  da validation o test. Lo scriviamo nella scheda del dataset.
+- **Real instances:** split by well (no well in more than one split) with TimeNet's
+  `StratifiedSplitter`, stratified by event type and grouped by well, 3/1/1 folds.
+- **Simulated and drawn instances:** always in train, because they come from no well.
+- Classes 3 and 6 have only 2 real wells, so validation or test can miss them; the card says so.
 
-## 6. Esempio concreto: `WELL-00002_20131104004101`
-Caso reale di **chiusura spuria della DHSV** (classe 2), 12.721 s (3 h 32 min), dal
-2013-11-04 00:41:01.
-
-**Record**
-```text
-metadata = {instance: "WELL-00002_20131104004101", well: "WELL-00002",
-            provenance: "real", event_class: 2, start_time: "2013-11-04T00:41:01"}
-```
-
-**Segnali** (solo quelli presenti in questo caso)
-| Source | Segnale | Unità | Note |
-|---|---|---|---|
-| Albero di Natale sottomarino | `P-TPT` | Pa | completo |
-| Albero di Natale sottomarino | `T-TPT` | °C | completo |
-| Albero di Natale sottomarino | `P-ANULAR` | Pa | completo |
-| Fondo pozzo (PDG) | `P-PDG` | Pa | costante a 0 → `constant_value=true` |
-| Stato del pozzo | `state` | — | sempre 0 |
-
-**Annotazioni sugli intervalli**
-| Da (s) | A (s) | Annotazione |
-|---|---|---|
-| 0 | 3.600 | nessuna (istanti senza etichetta) |
-| 3.600 | 7.355 | `event_phase=normal` |
-| 7.355 | 12.504 | `event_phase=transient`, `event_type=Spurious closure of DHSV` |
-| 12.504 | 12.721 | `event_phase=steady`, `event_type=Spurious closure of DHSV` |
-
-**Task**
-- `ClassificationTask`: risposta `Spurious closure of DHSV`.
-- `TemporalLocalizationTask`: risposta l'intervallo `[7.355 s, 12.504 s)`.
-
----
-
-## Punti da decidere insieme
-1. **ID:** `petrobras/three-w` (proposta), perché `petrobras/3w` produrrebbe una cartella non
-   importabile da Python.
-2. **Variabili sempre vuote:** le togliamo dal record (proposta) o le teniamo come segnali tutti
-   null?
-3. **Codici di `state`:** il significato (0-8) non è scritto nei file di 3W. Proposta: li teniamo
-   come codici numerici e cerchiamo la legenda nel toolkit 3W; se non la troviamo, lo dichiariamo.
-4. **Split:** casi simulati e disegnati sempre in train (proposta), o anche loro divisi?
-5. **Il task di localizzazione** nella prima PR (proposta: sì, perché sostiene l'allerta precoce),
-   o in una PR successiva per tenere la prima più piccola?
+## 6. Decisions taken with the team (2026-11-17)
+1. Id `petrobras/three-w`.
+2. Variables empty for a whole instance are dropped from the record.
+3. The `state` codes (0-8) are kept as numbers, since 3W does not document them.
+4. Simulated and drawn instances always go to train.
+5. The localization task is in the first PR, because it supports early warning.

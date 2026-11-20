@@ -1,87 +1,58 @@
-# Stato
+# Status
 
-Aggiornare a ogni fine sessione. Le voci più recenti in alto.
+Update it whenever a block starts or ends (see `CLAUDE.md`). Newest entries first.
 
-## Adesso (venerdì 20 novembre, sera)
-Mancano circa 2 giorni: consegna entro **domenica 22 alle 20:00** (scadenza vera: lunedì 23 alle
-08:59 ora italiana).
+## Now
+About 2 days left: submit by **Sunday 22 at 20:00** (hard deadline: Monday 23 at 08:59 Italian
+time).
 
-> **Per RenatoGallicola:** il contratto dei dati, l'estrazione delle finestre e le baseline sono
-> **già fatti** (vedi "Fatto" sotto): non rifarli. Oggi abbiamo anche scritto in parallelo lo stesso
-> connettore senza saperlo: quello di ariannabalducci resta solo in locale e non verrà pushato. Vale
-> la PR #833. Prima di iniziare un blocco, scriverlo qui.
-
-| Chi | Sta facendo | Blocchi |
+| Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Dati e TimeNet) | **In corso:** `make_windows.py` che legge il dataset TimeNet costruito dal connettore invece dei Parquet, con verifica che le finestre coincidano. Poi: script di valutazione, test di perturbazione, split casuale contro split per pozzo, baseline con i casi simulati | Nessuno |
-| ariannabalducci (Modello e demo) | Collegamento delle finestre a OpenTSLM; training su Modal | Nessuno: accesso a Llama 3.2 1B già concesso |
+| RenatoGallicola (Data and TimeNet) | **In progress:** `make_windows.py` reads the TimeNet dataset built by the connector instead of the Parquet files, and checks that the windows are identical (issue "Read training windows from the TimeNet dataset") | None |
+| ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
-## Da decidere subito (insieme)
-1. **Quale split usare nel training.** Oggi esistono due split per pozzo diversi:
-   - `splits/wells.json` (scelto da `scripts/make_windows.py`, bilanciato sulle finestre);
-   - quello del connettore della PR #833 (`StratifiedSplitter` 3/1/1, bilanciato sui casi).
+The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
-   **Proposta: usare quello del connettore**, così progetto e PR usano gli stessi dati. È stato
-   verificato con `make_windows.py --splits` e funziona: ogni classe principale ha finestre in val e
-   in test.
+## Final deliverables
+Not repo work, so not issues. Tick each one when done.
 
-   | Split | Finestre train / val / test | Pozzi train / val / test | Baseline `shape` test | `mean_std` test |
-   |---|---|---|---|---|
-   | `splits/wells.json` | 10.045 / 6.344 / 2.348 | 27 / 6 / 6 | 0,35 | 0,32 |
-   | connettore PR #833 | 12.827 / 2.690 / 3.220 | 24 / 7 / 8 | 0,39 | 0,26 |
+| Deliverable | Owner | When | Done |
+|---|---|---|---|
+| Post 1 on X and LinkedIn ("bringing 3W to TimeNet", with the PR link) | RenatoGallicola | Friday evening or Saturday morning | |
+| Post 2 on X and LinkedIn (results and demo, with metric screenshots) | both | Sunday | |
+| Post on Discord | ariannabalducci | Sunday | |
+| Submission form (PR link, demo link, repo, post links) | RenatoGallicola | **Sunday by 20:00** | |
+| Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
-   Con lo split del connettore il train ha poche finestre delle classi 7 e 9 (180 e 70). La
-   cross-validation per pozzo non dipende dallo split: 0,38-0,40.
-2. **Ritocchi alla PR #833**, presi dal connettore scritto in parallelo:
-   - **Fuso orario:** `_start_time` assume UTC (`datetime.fromtimestamp(..., tz=UTC)`), ma i
-     timestamp di 3W non hanno fuso orario e il rilascio non lo dichiara. Non è un dato verificato.
-     Proposta: niente `start_time` assoluto e l'inizio come testo in `Record.metadata`, oppure una
-     fonte che dica il fuso.
-   - **Scheda del dataset:** mancano `license_url` (la licenza CC BY dei dati è in
-     `dataset/LICENSE-CC-BY` del rilascio; `LICENSE.md` è la licenza Apache del codice) e
-     `citation`. Per la 2.0.0, `CITATION.md` di 3W indica: Vaz Vargas, R.E., de Melo Junior, A.J.,
-     de Campos Lima, C.B. et al. *3W Dataset 2.0.0: a realistic and public dataset with rare
-     undesirable real events in oil wells.* Sci Data 13, 949 (2026),
-     https://doi.org/10.1038/s41597-026-07225-z. C'è anche il campo `source_revision` per il commit.
-   - **Facoltativo:** un `README.md` nella cartella del connettore con le decisioni, come
-     `physionet/sleep_edfx`.
-
-## Fatto
-- 2026-11-20 (RenatoGallicola): **ritocchi alla PR #833 fatti** (3 commit, segnata "Ready for
-  review"): nessuna ora di inizio assoluta (3W non dichiara il fuso orario, l'inizio resta testo in
-  `metadata["start"]`), scheda con `source_revision`, `license_url` e citazione della 2.0.0,
-  `README.md` del connettore. **Split deciso: quello del connettore.**
-- 2026-11-20 (ariannabalducci): **contratto dei dati** approvato e implementato
-  (`docs/DATA_CONTRACT.md`, `scripts/make_windows.py`): 18.737 finestre di 30 minuti da 39 pozzi
-  reali, in circa 40 secondi. Il pozzo `WELL-00008` non ha finestre delle classi principali.
-- 2026-11-20 (ariannabalducci): **baseline XGBoost** (`scripts/baselines.py`, risultati in
-  `results/baselines.json`). Macro-F1 su 6 classi, pozzi mai visti: feature di forma 0,35 in test,
-  0,39 ± 0,13 in cross-validation per pozzo; solo media e deviazione standard 0,32 in test, 0,40 ±
-  0,14 in cross-validation. Due risultati da raccontare:
-  1. ogni pozzo ha sensori diversi: senza correzioni il modello impara quali sensori ci sono, e su
-     pozzi nuovi riconosce 0 casi di instabilità di flusso (con i sensori nascosti a caso: F1 0,6);
-  2. media e deviazione standard bastano quasi quanto le feature di forma: OpenTSLM scrive proprio
-     quei numeri nel prompt, quindi i test di perturbazione sono indispensabili.
-- 2026-11-20 (ariannabalducci): guardate le PR dell'hackathon su TimeNet. Nessun altro team usa 3W.
-  Un altro team ha preso le turbine eoliche CARE (PR #792). Il maintainer TimoStoff fa revisioni
-  dettagliate (PR #788: tipi con nome, validazione più stretta). Alcune PR aperte dai maintainer
-  cambiano l'API dei connettori (#821, #822, #827): la PR #833 potrebbe richiedere un rebase.
-- 2026-11-20: **PR in bozza aperta**: https://github.com/OpenTSLM/TimeNet/pull/833 (2 commit;
-  allineata allo stile dei connettori esistenti). Etichetta `area:connectors` da aggiungere ai
-  maintainer: noi non abbiamo i permessi.
-- 2026-11-17: **connettore 3W completato** nel fork, branch `feature/petrobras-three-w`
-  (`datasets/petrobras/three_w/`). ID `petrobras/three-w`. Verificato: ruff, ty (anche Python 3.11),
-  11 test, controlli di tutti i connettori, costruzione completa (18 min, 1,1 GB: 2.228 record, 2.228
-  task di classificazione, 1.142 di localizzazione). Il dataset costruito è nella cartella
-  `registry/` accanto ai repo, sul PC di RenatoGallicola.
-- 2026-11-17: ruoli confermati; `docs/SETUP.md` e `.env.example`; ariannabalducci collaboratrice su
-  entrambi i repo (invito accettato).
-- 2026-11-17: ambiente TimeNet funzionante; 3W scaricato al commit `c86cc7c7` ed esplorato
-  (`docs/3W_EXPLORATION.md`); progetto del connettore approvato (`docs/CONNECTOR_DESIGN.md`).
-- 2026-11-12: registrazione all'hackathon con il pitch su 3W.
-
-## Da fare a breve
-- Decidere lo split e i ritocchi alla PR (sopra).
-- Segnare la PR #833 come "Ready for review" quando il team è soddisfatto.
-- Primo post su X e LinkedIn.
-- Verificare se è arrivato il voucher Nebius.
+## Done
+- 2026-11-20 (RenatoGallicola): **PR #833 fixes done** (3 commits, marked "Ready for review"): no
+  absolute start time (3W states no time zone; the start stays as text in `metadata["start"]`); card
+  with `source_revision`, `license_url` and the 2.0.0 citation; connector `README.md`. **Split
+  decided: the connector's.**
+- 2026-11-20 (ariannabalducci): **data contract** approved and implemented (`docs/DATA_CONTRACT.md`,
+  `scripts/make_windows.py`): 18,737 30-minute windows from 39 real wells, in about 40 seconds. Well
+  `WELL-00008` has no windows of the main classes.
+- 2026-11-20 (ariannabalducci): **XGBoost baselines** (`scripts/baselines.py`, results in
+  `results/baselines.json`). Macro-F1 over 6 classes on unseen wells: shape features 0.35 on test,
+  0.39 ± 0.13 in cross-validation by well; mean and standard deviation only 0.32 on test, 0.40 ±
+  0.14 in cross-validation. Two findings to report:
+  1. each well has different sensors: without countermeasures the model learns which sensors exist,
+     and on new wells it recognizes 0 flow-instability windows (with random sensor dropout: F1 0.6);
+  2. mean and standard deviation are almost as good as shape features. OpenTSLM writes exactly those
+     numbers into the prompt, so perturbation tests are required.
+- 2026-11-20 (ariannabalducci): looked at the hackathon PRs on TimeNet. No other team uses 3W.
+  Another team took the CARE wind turbines (PR #792). Maintainer TimoStoff reviews in detail (PR
+  #788: named types, stricter validation). Some open maintainer PRs change the connector API (#821,
+  #822, #827): PR #833 may need a rebase.
+- 2026-11-20: **PR opened**: https://github.com/OpenTSLM/TimeNet/pull/833. The `area:connectors`
+  label must be added by the maintainers: we lack the permission.
+- 2026-11-17: **3W connector completed** in the fork, branch `feature/petrobras-three-w`
+  (`datasets/petrobras/three_w/`). Id `petrobras/three-w`. Verified: ruff, ty (also Python 3.11), 11
+  tests, checks of all connectors, full build (18 min, 1.1 GB: 2,228 records, 2,228 classification
+  tasks, 1,142 localization tasks). The built dataset is in the `registry/` folder next to the repos
+  on RenatoGallicola's computer.
+- 2026-11-17: roles confirmed; `docs/SETUP.md` and `.env.example`; ariannabalducci collaborator on
+  both repos.
+- 2026-11-17: TimeNet environment working; 3W downloaded at commit `c86cc7c7` and explored
+  (`docs/3W_EXPLORATION.md`); connector design approved (`docs/CONNECTOR_DESIGN.md`).
+- 2026-11-12: registered for the hackathon with the 3W pitch.

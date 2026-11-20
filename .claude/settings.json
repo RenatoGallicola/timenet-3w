@@ -1,0 +1,21 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv",
+            "args": ["run", "--no-project", "python", ".claude/hooks/session_start.py"],
+            "timeout": 60,
+            "statusMessage": "Syncing timenet-3w and reading the team status"
+          }
+        ]
+      }
+    ]
+  }
+}

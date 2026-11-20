@@ -1,64 +1,79 @@
 # CLAUDE.md
 
-Contesto condiviso per le sessioni Claude Code di entrambi i membri del team.
-Rispondi sempre in italiano. Codice, commenti e README pubblici in inglese.
+Shared context for the Claude Code sessions of both team members.
 
-## Prima di iniziare ogni sessione
-1. `git pull` su questo repo (e sul fork di TimeNet, se ci lavori).
-2. Leggi `docs/STATUS.md` per sapere chi sta facendo cosa.
-3. Controlla `docs/DECISIONS.md` prima di proporre di cambiare qualcosa di già deciso.
+- **Talk to the user in Italian.** Everything written to the repository and to GitHub (code,
+  comments, docs, commit messages, issues, PRs) is in **English**.
 
-## Alla fine di ogni sessione
-- Aggiorna `docs/STATUS.md` (cosa è fatto, cosa è in corso, cosa blocca).
-- Commit piccoli e frequenti, poi `git push`.
-- **Nessuna attribuzione a Claude:** niente righe `Co-Authored-By: Claude` nei commit e niente
-  "Generated with Claude Code" nelle PR. Commit e PR risultano solo di chi li fa.
-- Se prendi una decisione, aggiungila a `docs/DECISIONS.md` con data e motivo.
+## At the start of every session
+A `SessionStart` hook (`.claude/hooks/session_start.py`) runs `git pull --ff-only` and shows you the
+"Now" and "Final deliverables" sections of `docs/STATUS.md` plus the open GitHub issues. If the
+hook output is missing, do the same by hand. Then read `docs/DECISIONS.md` before proposing to
+change anything already decided.
 
-## Il progetto in breve
+## Claim before you work (avoid overlaps)
+1. Every block of work that lives in the repo is a **GitHub issue** on
+   `RenatoGallicola/timenet-3w`. Posts and the submission form are not issues: they are tracked in
+   the "Final deliverables" section of `docs/STATUS.md`.
+2. **Before starting a block**, check the issues (`gh issue list`). If the block is assigned to the
+   other member, stop and tell the user. If it is free, assign it to the current user
+   (`gh issue edit <n> --add-assignee @me`), add it to "Now" in `docs/STATUS.md`, and **commit and
+   push that change right away**. If the block has no issue yet, create one first.
+3. **When a block is done**, close its issue with a short summary, update `docs/STATUS.md`, and
+   push.
+4. Record every decision in `docs/DECISIONS.md` with its date and reason.
+
+## Commits and PRs
+- Small, frequent commits in Conventional Commits form (`feat: ...`, `docs: ...`), then push.
+- **No Claude attribution:** no `Co-Authored-By: Claude` trailer and no "Generated with Claude Code"
+  line. Commits and PRs show only the person who makes them. `.claude/settings.json` turns the
+  automatic attribution off.
+
+## The project in short
 - **Hackathon:** TimeNet Online Hackathon, Round 1 (Aionic Labs + ETH Zurich Agentic Systems Lab).
-  Scadenza: **22 novembre 2026, 23:59 PST = 23 novembre, 08:59 ora italiana**. Obiettivo interno:
-  consegnare **domenica 22 entro le 20:00**.
-- **Caso d'uso:** riconoscere e spiegare gli eventi anomali nei pozzi petroliferi, con il dataset
+  Deadline: **2026-11-22 23:59 PST = 2026-11-23 08:59 Italian time**. Internal target: submit on
+  **Sunday 22 by 20:00**.
+- **Use case:** detect and explain abnormal events in offshore oil wells with
   [Petrobras 3W](https://github.com/petrobras/3W) v2.0.0.
-- **Criteri di giudizio:** caso d'uso e impatto; esecuzione tecnica; dati e TimeNet; risultati e
-  valutazione; presentazione e social (contano i post su X e LinkedIn).
-- **Consegne:** link alla PR su OpenTSLM/TimeNet che aggiunge il dataset; link a demo o sito; questo
-  repo; post pubblici su X e LinkedIn con screenshot delle metriche; post su Discord; form di consegna.
+- **Judging criteria:** use case and impact; technical execution; data and TimeNet; results and
+  evaluation; showcase and social engagement (the X and LinkedIn posts count).
+- **Deliverables:** link to the PR on OpenTSLM/TimeNet that adds the dataset; link to a demo or
+  site; this repo; public posts on X and LinkedIn with metric screenshots; a Discord post; the
+  submission form.
 
-Piano completo: `docs/PLAN.md`.
+Full plan: `docs/PLAN.md`. Data format between the two parts: `docs/DATA_CONTRACT.md`.
 
-## Repository
-| Repo | Uso |
+## Repositories
+| Repo | Use |
 |---|---|
-| https://github.com/RenatoGallicola/timenet-3w | Questo repo: collegamento TimeNet → OpenTSLM, training, valutazione, demo, documenti |
-| https://github.com/RenatoGallicola/TimeNet | Fork di OpenTSLM/TimeNet: solo il connettore 3W, da cui parte la PR |
+| https://github.com/RenatoGallicola/timenet-3w | This repo: windows, TimeNet-to-OpenTSLM bridge, training, evaluation, demo, docs |
+| https://github.com/RenatoGallicola/TimeNet | Fork of OpenTSLM/TimeNet: only the 3W connector, PR [#833](https://github.com/OpenTSLM/TimeNet/pull/833) |
 
-## Vincoli
-- **Spesa zero.** Solo risorse gratuite: Modal ($30 al mese per workspace, con tetto di spesa a 0),
-  Kaggle, Hugging Face ZeroGPU. Nessuna API a pagamento. Nebius solo se arriva il voucher e il team
-  accetta la ricarica obbligatoria di 25 USD.
-- **OpenTSLM usa bf16:** il training va fatto su A100/H100 (Modal). Le GPU di Kaggle (T4/P100) non
-  supportano bf16; vanno bene per generare testo con modelli open.
-- **PC locale:** Windows, nessuna GPU NVIDIA, 16 GB di RAM, circa 30 GB liberi, niente WSL. Si usa
-  uv direttamente su Windows.
-- **Segreti:** token e chiavi (Hugging Face, Modal) solo in `.env`, mai nel repo.
+## Constraints
+- **Zero spend.** Free resources only: Modal ($30 a month per workspace, spend limit set to 0),
+  Kaggle, Hugging Face ZeroGPU. No paid APIs. Nebius only if the voucher arrives and the team accepts
+  its mandatory USD 25 top-up.
+- **OpenTSLM uses bf16:** train on A100/H100 (Modal). Kaggle GPUs (T4/P100) have no bf16; they are
+  fine for generating text with open models.
+- **Secrets:** tokens and keys (Hugging Face, Modal) go only in `.env`, never in the repo.
 
-## Regole del repo TimeNet (per il connettore)
-- Seguire `AGENTS.md` e la skill `.agents/skills/add-dataset-connector` del repo TimeNet.
-- Il progetto del connettore va approvato dal team **prima** di scrivere codice.
-- Ogni file sorgente fissato a un commit, con sha256. Dati mancanti dichiarati, **mai riempiti**.
-- Commit nel formato Conventional Commits; mai `--no-verify`.
+## Rules of the TimeNet repo (for the connector)
+- Follow `AGENTS.md` and the `.agents/skills/add-dataset-connector` skill of the TimeNet repo.
+- Every source file is pinned to a commit with a SHA-256. Missing data is declared, **never filled**.
+- Conventional Commits; never `--no-verify`.
 
-## Fatti già verificati (non ricontrollarli)
-- 3W v2.0.0: licenza dati CC BY 4.0; 2.228 file Parquet (1,87 GB) in git senza LFS; 1.119 casi reali
-  da 40 pozzi, 1.089 simulati, 20 disegnati a mano; 27 variabili; 10 classi; l'etichetta transitoria
-  è classe + 100. Casi reali per classe: normale 594, aumento BSW 4, chiusura spuria DHSV 22,
-  slugging severo 32, instabilità di flusso 343, perdita rapida di produttività 11, restrizione
-  rapida PCK 6, incrostazioni PCK 36, idrati in linea di produzione 14, idrati in linea di servizio 57.
-- OpenTSLM non ha un loader per TimeNet: va scritto. `OpenTSLMSP` fissa bf16 e attention eager;
-  LoRA r=16 nelle fasi con rationale. Checkpoint pronti: `OpenTSLM/{llama-3.2-1b,...}-{tsqa,m4,har,sleep,ecg}-{sp,flamingo}`.
-- OpenTSLM scrive media e deviazione standard di ogni serie nel prompt: il modello potrebbe usare
-  quelle statistiche invece del segnale. Va testato con perturbazioni.
-- Paper di riferimento su 3W: arXiv 2608.04041 (LLM da 397B con metriche calcolate, 35,1% top-1 su
-  9 classi; protocollo diverso dal nostro).
+## Verified facts (do not check them again)
+- 3W v2.0.0: data license CC BY 4.0; 2,228 Parquet files (1.87 GB) in plain git without LFS; 1,119
+  real instances from 40 wells, 1,089 simulated, 20 hand-drawn; 27 variables at 1 Hz; 10 classes;
+  the transient label is class + 100. Real instances per class: normal 594, abrupt increase of BSW
+  4, spurious closure of DHSV 22, severe slugging 32, flow instability 343, rapid productivity loss
+  11, quick restriction in PCK 6, scaling in PCK 36, hydrate in production line 14, hydrate in
+  service line 57. The timestamps carry no time zone.
+- OpenTSLM has no TimeNet loader: we write the bridge. `OpenTSLMSP` hard-codes bf16 and eager
+  attention; LoRA r=16 in the rationale stages. Ready checkpoints:
+  `OpenTSLM/{llama-3.2-1b,...}-{tsqa,m4,har,sleep,ecg}-{sp,flamingo}`.
+- OpenTSLM writes each series' mean and standard deviation into the prompt: the model may use those
+  statistics instead of the signal. The baselines confirm it (see `docs/STATUS.md`), so perturbation
+  tests are required.
+- Reference paper on 3W: arXiv 2608.04041 (a 397B LLM given computed metrics, 35.1% top-1 over 9
+  classes; a different protocol from ours).

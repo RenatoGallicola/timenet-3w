@@ -1,67 +1,64 @@
-# Contratto dei dati
+# Data contract
 
-Formato comune tra la parte "Dati e TimeNet" e la parte "Modello e demo".
-Approvato il 2026-11-20. Ogni modifica va concordata e registrata in `docs/DECISIONS.md`.
+The common format between the "Data and TimeNet" part and the "Model and demo" part.
+Approved on 2026-11-20. Every change must be agreed and recorded in `docs/DECISIONS.md`.
 
-Lo script che lo implementa è `scripts/make_windows.py`: legge i Parquet di 3W (commit
-`c86cc7c70063646910be7292de8a54a6fb2a8399`) e scrive le finestre. Quando il connettore è pronto,
-lo stesso formato verrà prodotto leggendo da TimeNet.
+The script that implements it is `scripts/make_windows.py`: it reads the 3W Parquet files (commit
+`c86cc7c70063646910be7292de8a54a6fb2a8399`) and writes the windows. The same format will be produced
+by reading from TimeNet, with the connector of PR #833.
 
-## Valutazione principale
+## Main evaluation
 
-| Voce | Decisione |
+| Item | Decision |
 |---|---|
-| Casi usati | Solo **reali** (`WELL-*`) |
-| Classi | **0, 2, 4, 7, 8, 9**: le uniche con almeno 6 pozzi reali |
-| Classi rare (1, 3, 5, 6) | Fuori dalla valutazione principale. Eventuale esperimento a parte: training sui simulati, test sui reali |
-| Variabili (6, in quest'ordine) | `P-TPT`, `T-TPT`, `P-ANULAR`, `P-MON-CKP`, `P-JUS-CKGL`, `T-JUS-CKP` |
-| Unità | Quelle originali di 3W (Pa, °C), senza normalizzazione. La normalizzazione la fa il modello |
-| Finestra | **30 minuti** (1.800 s a 1 Hz) |
-| Ricampionamento | Media su blocchi di 10 s → **0,1 Hz, 180 punti** per variabile. Un blocco senza valori resta NaN |
-| Passo tra finestre | 15 minuti (900 s) per le normali; **5 minuti** (300 s) per quelle con un evento, che dura solo 1-3 ore |
-| Massimo per caso | 20 finestre per caso, scelte a intervalli regolari, per non far pesare troppo i casi lunghi |
+| Instances used | **Real** only (`WELL-*`) |
+| Classes | **0, 2, 4, 7, 8, 9**: the only ones with at least 6 real wells |
+| Rare classes (1, 3, 5, 6) | Outside the main evaluation. Optional separate experiment: train on simulated instances, test on real ones |
+| Variables (6, in this order) | `P-TPT`, `T-TPT`, `P-ANULAR`, `P-MON-CKP`, `P-JUS-CKGL`, `T-JUS-CKP` |
+| Units | The original 3W units (Pa, °C), not normalized. The model does the normalization |
+| Window | **30 minutes** (1,800 s at 1 Hz) |
+| Resampling | Mean over 10 s blocks → **0.1 Hz, 180 points** per variable. A block without values stays NaN |
+| Stride between windows | 15 minutes (900 s) for normal windows; **5 minutes** (300 s) for windows with an event, which lasts only 1-3 hours |
+| Maximum per instance | 20 windows per instance, chosen at regular intervals, so that long instances do not weigh too much |
 
-## Etichetta di una finestra
+## Window label
 
-Ogni secondo di 3W ha un'etichetta: 0 (normale), `c` (evento `c` stazionario), `100 + c` (evento
-`c` transitorio), oppure vuota.
+Each second of 3W has a label: 0 (normal), `c` (event `c`, steady state), `100 + c` (event `c`,
+transient), or empty.
 
-| Etichetta della finestra | Regola |
+| Window label | Rule |
 |---|---|
-| Evento `c` | Almeno il **50%** dei secondi ha etichetta `c` o `100 + c` |
-| Normale (0) | Almeno il **95%** dei secondi ha etichetta 0 |
-| Scartata | Tutti gli altri casi, e le finestre con più del 20% di secondi senza etichetta |
+| Event `c` | At least **50%** of the seconds are labeled `c` or `100 + c` |
+| Normal (0) | At least **95%** of the seconds are labeled 0 |
+| Dropped | Every other case, and windows with more than 20% of unlabeled seconds |
 
-Le finestre "normali" possono venire anche dalla parte normale dei casi con un evento: così la
-classe normale copre più pozzi.
+Normal windows can also come from the normal part of instances with an event, so that the normal
+class covers more wells.
 
-Per ogni finestra si salva anche la **fase**: `transient` se la maggioranza dei secondi dell'evento
-è transitoria, altrimenti `steady` (per le normali: `normal`). Le metriche si riportano su tutte le
-finestre e, a parte, sulle sole finestre `transient`: è la misura dell'allerta precoce. Le classi
-3 e 4 di 3W non hanno fase transitoria.
+Each window also stores its **phase**: `transient` if most of the event's seconds are transient,
+otherwise `steady` (`normal` for normal windows). Metrics are reported on all windows and,
+separately, on the `transient` windows only: that is the early-warning measure. Classes 3 and 4 of
+3W have no transient phase.
 
-## Variabili mancanti (mai riempite)
-- Una variabile è **presente** in una finestra se almeno l'80% dei suoi 180 punti non è NaN.
-- I valori mancanti restano NaN nei file. Non si interpolano.
-- Nel prompt di OpenTSLM entrano solo le variabili presenti (la maschera è salvata).
-- Le finestre con meno di 2 variabili presenti si scartano.
+## Missing variables (never filled)
+- A variable is **present** in a window if at least 80% of its 180 points are not NaN.
+- Missing values stay NaN in the files. They are not interpolated.
+- Only the present variables enter the OpenTSLM prompt (the mask is saved).
+- Windows with fewer than 2 present variables are dropped.
 
 ## Split
-- **Per pozzo:** nessun pozzo compare in più di uno split.
-- Circa 70% / 15% / 15% dei pozzi in train / validation / test, scelto con una ricerca a seme
-  fisso: ogni classe ha almeno il 5% delle sue finestre sia in validation sia in test, e le quote
-  per classe sono il più vicine possibile al 70/15/15.
-- **Da decidere (vedi `docs/STATUS.md`):** usare `splits/wells.json` o lo split del connettore
-  della PR #833, salvato in `splits/wells_connector.json` (si passa con `--splits`).
-- L'assegnazione dei pozzi è salvata in `splits/wells.json` (nel repo). Il connettore TimeNet
-  deve usare la stessa assegnazione; se non è possibile, vale questo file e la differenza va
-  dichiarata.
+- **By well:** no well appears in more than one split.
+- **Decided on 2026-11-20: the connector's split from PR #833**, saved in
+  `splits/wells_connector.json` (passed with `--splits`).
+- The alternative split `splits/wells.json` (about 70% / 15% / 15% of the wells, chosen by a
+  fixed-seed search so that each class has at least 5% of its windows in both validation and test)
+  stays in the repo for comparison.
 
-## Formato dello scambio
-Nella cartella `data/windows/` (fuori da git):
+## Exchange format
+In the `data/windows/` folder (outside git):
 
-| File | Contenuto |
+| File | Content |
 |---|---|
-| `{train,val,test}.npz` | `X`: float32 `[N, 6, 180]` con NaN per i mancanti; `mask`: bool `[N, 6]` (variabile presente); `y`: int `[N]` (classe 3W: 0, 2, 4, 7, 8, 9) |
-| `{train,val,test}.csv` | Una riga per finestra, nello stesso ordine: `window_id`, `instance`, `well`, `label`, `phase`, `start_s`, `event_frac`, `transient_frac` |
-| `meta.json` | Commit di 3W, variabili, nomi delle classi, parametri della finestra, conteggi |
+| `{train,val,test}.npz` | `X`: float32 `[N, 6, 180]` with NaN for missing values; `mask`: bool `[N, 6]` (variable present); `y`: int `[N]` (3W class: 0, 2, 4, 7, 8, 9) |
+| `{train,val,test}.csv` | One row per window, in the same order: `window_id`, `instance`, `well`, `label`, `phase`, `start_s`, `event_frac`, `transient_frac` |
+| `meta.json` | 3W commit, variables, class names, window parameters, counts |

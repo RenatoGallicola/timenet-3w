@@ -1,23 +1,25 @@
-# Decisioni
+# Decisions
 
-Una riga per decisione: data, decisione, motivo. Le più recenti in fondo.
+One row per decision: date, decision, reason. Newest at the bottom.
 
-| Data | Decisione | Motivo |
+| Date | Decision | Reason |
 |---|---|---|
-| 2026-11-11 | Caso d'uso: eventi anomali nei pozzi petroliferi con Petrobras 3W | Primo per 2 revisori indipendenti su 3, secondo per il terzo, su 17 candidati. Dominio "industrial" di TimeNet ancora vuoto, allineato con gli esempi della challenge e con i settori di Aionic Labs, poca concorrenza |
-| 2026-11-11 | Scartati Parkinson (Daphnet), WESAD, apnea da ECG, turbine eoliche | Daphnet: solo 29,5 minuti di freezing e domande già nella PR #720. WESAD: nessuna licenza utilizzabile. Apnea: ID dei pazienti mancanti, dominio affollato. Eolico: sensori anonimi, circa 45 guasti |
-| 2026-11-12 | Campo "previous work" della registrazione lasciato vuoto | Si parte da un progetto nuovo; evitare ambiguità con repo precedenti non finiti |
-| 2026-11-17 | Si punta a fare tutto il piano originale, in ordine di priorità | Scelta del team |
-| 2026-11-17 | Training su Modal (gratis, con tetto di spesa a 0); Nebius opzionale | Nebius richiede una ricarica di 25 USD per il voucher; il team vuole spesa zero |
-| 2026-11-17 | Repo pubblico `timenet-3w` sul GitHub di uno dei membri; nome da prodotto deciso più avanti | Sviluppo in pubblico; nome provvisorio descrittivo |
-| 2026-11-17 | Sviluppo locale su Windows con uv, senza WSL | WSL non installato |
-| 2026-11-17 | 3W fissato al commit `c86cc7c70063646910be7292de8a54a6fb2a8399` (v2.0.0) | Ultimo commit al momento del download; tutto il team usa gli stessi dati |
-| 2026-11-17 | Ruoli: RenatoGallicola su Dati e TimeNet, ariannabalducci su Modello e demo | Le due parti procedono in parallelo; chi finisce il connettore prende poi blocchi della parte modelli |
-| 2026-11-17 | Non si aspetta il merge della PR | Per la consegna basta il link; il progetto installa TimeNet dal fork |
-| 2026-11-20 | Connettore con 6 tipi di segnale per grandezza fisica e `TimeNetConnectorError` | Stile dei connettori esistenti di TimeNet |
-| 2026-11-20 | Nessuna attribuzione a Claude in commit e PR | Richiesta del team |
-| 2026-11-20 | Contratto dei dati approvato (`docs/DATA_CONTRACT.md`): classi 0, 2, 4, 7, 8, 9 solo reali; 6 variabili; finestre di 30 min a 0,1 Hz (180 punti) | Uniche classi con almeno 6 pozzi reali; finestre abbastanza corte per OpenTSLM |
-| 2026-11-20 | Passo di 5 min per le finestre con evento (15 min per le normali) | Gli eventi durano 1-3 ore: con 15 min la classe 2 aveva solo 3 finestre in test |
-| 2026-11-20 | Baseline senza livelli assoluti, con sensori nascosti a caso nel training, più cross-validation a 5 fold per pozzo | Ogni pozzo ha sensori diversi: il modello imparava quali sensori c'erano invece di cosa facevano i segnali. Un singolo split dipende troppo da quali pozzi capitano in test |
-| 2026-11-20 | Split per il training: quello del connettore della PR #833 (`splits/wells_connector.json`) | Progetto e PR usano gli stessi dati; per la classe 9 si possono aggiungere i 150 casi simulati |
-| 2026-11-20 | Le finestre del training si leggono dal dataset TimeNet, non dai Parquet | Il pitch e il criterio "Dati e TimeNet" chiedono che il modello si addestri da TimeNet |
+| 2026-11-11 | Use case: abnormal events in oil wells with Petrobras 3W | First for 2 of 3 independent reviewers and second for the third, out of 17 candidates. TimeNet's `industrial` domain was still empty; it matches the challenge examples and Aionic Labs' sectors; little competition |
+| 2026-11-11 | Dropped Parkinson's (Daphnet), WESAD, ECG sleep apnea and wind turbines | Daphnet: only 29.5 minutes of freezing, and its questions are already in PR #720. WESAD: no usable license. Apnea: no patient ids, crowded domain. Wind: anonymized sensors, about 45 faults |
+| 2026-11-12 | "Previous work" field of the registration left empty | New project; avoid confusion with earlier unfinished repos |
+| 2026-11-17 | Aim to do the whole original plan, in priority order | Team choice |
+| 2026-11-17 | Train on Modal (free, spend limit 0); Nebius optional | Nebius requires a USD 25 top-up for the voucher; the team wants zero spend |
+| 2026-11-17 | Public repo `timenet-3w` on one member's GitHub; product name decided later | Building in public; provisional descriptive name |
+| 2026-11-17 | Local development on Windows with uv, without WSL | WSL not installed |
+| 2026-11-17 | 3W pinned at commit `c86cc7c70063646910be7292de8a54a6fb2a8399` (v2.0.0) | Latest commit at download time; the whole team uses the same data |
+| 2026-11-17 | Roles: RenatoGallicola on Data and TimeNet, ariannabalducci on Model and demo | The two parts run in parallel; whoever finishes the connector then takes blocks of the model work |
+| 2026-11-17 | Do not wait for the PR to be merged | The submission only needs the link; the project installs TimeNet from the fork |
+| 2026-11-20 | Connector with 6 signal specs by physical quantity and `TimeNetConnectorError` | Style of the existing TimeNet connectors |
+| 2026-11-20 | No Claude attribution in commits and PRs | Team request |
+| 2026-11-20 | Data contract approved (`docs/DATA_CONTRACT.md`): classes 0, 2, 4, 7, 8, 9, real instances only; 6 variables; 30-minute windows at 0.1 Hz (180 points) | Only classes with at least 6 real wells; windows short enough for OpenTSLM |
+| 2026-11-20 | 5-minute stride for event windows (15 minutes for normal ones) | Events last 1-3 hours: with 15 minutes, class 2 had only 3 test windows |
+| 2026-11-20 | Baselines without absolute levels, with random sensor dropout in training, plus 5-fold cross-validation by well | Each well has different sensors: the model learned which sensors existed instead of what the signals did. A single split depends too much on which wells land in test |
+| 2026-11-20 | Training split: the connector's split from PR #833 (`splits/wells_connector.json`) | Project and PR use the same data; for class 9 the 150 simulated instances can be added |
+| 2026-11-20 | Training windows are read from the TimeNet dataset, not from the Parquet files | The pitch and the "Data and TimeNet" criterion require that the model trains from TimeNet |
+| 2026-11-20 | Coordination: GitHub issues for repo work, claimed before work starts; posts and submission tracked in `docs/STATUS.md`; a `SessionStart` hook pulls and shows status and issues | Avoid the overlap of 2026-11-20, when the same blocks were done twice |
+| 2026-11-20 | The whole repository is in English | Public repository read by the judges |
