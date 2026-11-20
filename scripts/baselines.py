@@ -14,9 +14,9 @@ Each well has its own set of sensors, so a model can learn which sensors are pre
 what the signals do. Training therefore also sees copies of each window with random present sensors
 hidden (keeping at least 2). Missing values stay NaN: XGBoost handles them natively.
 
-Reported: the fixed split of splits/wells.json (fit on train, report val and test), and a 5-fold
-cross-validation grouped by well over all windows, which is less sensitive to which wells end up
-in test.
+Reported: the split the windows were cut with (fit on train, report val and test; the team uses the
+connector's split, splits/wells_connector.json), and a 5-fold cross-validation grouped by well over
+all windows, which is less sensitive to which wells end up in test.
 """
 
 from __future__ import annotations
@@ -44,6 +44,18 @@ def load(folder: Path, split: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, 
     return data["X"], data["mask"], data["y"], pd.read_csv(folder / f"{split}.csv")
 
 
+def mean_crossings(Z: np.ndarray) -> np.ndarray:
+    """Share of consecutive point pairs, both present, where the standardized signal changes sign.
+
+    A missing point is skipped, not read as 0, so gaps add no false crossings.
+    """
+    sign = np.sign(Z)
+    valid = ~np.isnan(Z[..., 1:]) & ~np.isnan(Z[..., :-1])
+    crossings = (sign[..., 1:] * sign[..., :-1] < 0) & valid
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return crossings.sum(2) / valid.sum(2)
+
+
 def shape_features(X: np.ndarray) -> np.ndarray:
     """X [N, V, T] -> [N, F, V]: scale-free features of each signal."""
     mean = np.nanmean(X, 2, keepdims=True)
@@ -61,7 +73,7 @@ def shape_features(X: np.ndarray) -> np.ndarray:
         np.nanmean(Z[..., -q:], 2) - np.nanmean(Z[..., :q], 2),  # change, first vs last quarter
         np.nanstd(np.diff(Z, axis=2), 2),  # roughness
         autocorr(1), autocorr(6), autocorr(18),  # lags of 10 s, 1 min, 3 min
-        np.nansum(np.diff(np.sign(np.nan_to_num(Z)), axis=2) != 0, 2) / T,  # mean crossings
+        mean_crossings(Z),
         np.nanmean(Z**3, 2), np.nanmean(Z**4, 2), np.nanmax(np.abs(Z), 2),  # skew, kurtosis, peak
         np.log10(std[..., 0] / (np.abs(mean[..., 0]) + 1e-9) + 1e-12),  # relative spread
         (np.nanmean(X[..., -q:], 2) - np.nanmean(X[..., :q], 2)) / (np.abs(mean[..., 0]) + 1e-9),  # relative change
