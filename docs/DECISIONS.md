@@ -16,3 +16,6 @@ Una riga per decisione: data, decisione, motivo. Le più recenti in fondo.
 | 2026-11-17 | Non si aspetta il merge della PR | Per la consegna basta il link; il progetto installa TimeNet dal fork |
 | 2026-11-20 | Connettore con 6 tipi di segnale per grandezza fisica e `TimeNetConnectorError` | Stile dei connettori esistenti di TimeNet |
 | 2026-11-20 | Nessuna attribuzione a Claude in commit e PR | Richiesta del team |
+| 2026-11-20 | Contratto dei dati approvato (`docs/DATA_CONTRACT.md`): classi 0, 2, 4, 7, 8, 9 solo reali; 6 variabili; finestre di 30 min a 0,1 Hz (180 punti) | Uniche classi con almeno 6 pozzi reali; finestre abbastanza corte per OpenTSLM |
+| 2026-11-20 | Passo di 5 min per le finestre con evento (15 min per le normali) | Gli eventi durano 1-3 ore: con 15 min la classe 2 aveva solo 3 finestre in test |
+| 2026-11-20 | Baseline senza livelli assoluti, con sensori nascosti a caso nel training, più cross-validation a 5 fold per pozzo | Ogni pozzo ha sensori diversi: il modello imparava quali sensori c'erano invece di cosa facevano i segnali. Un singolo split dipende troppo da quali pozzi capitano in test |
