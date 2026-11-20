@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: post 1; #3 (perturbation tests) once an OpenTSLM model exists; final test evaluation on Sunday | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #3, preparing the perturbation tool and testing it on XGBoost (the OpenTSLM part runs once a model exists). Next: README draft, post 1 | None |
 | ariannabalducci (Model and demo) | Window-to-OpenTSLM bridge; training on Modal | None: access to Llama 3.2 1B granted |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,14 +25,14 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
-- 2026-11-21 (RenatoGallicola): **#5 done** (PR #20): simulated windows of classes 2, 8, 9 added to
+- 2026-11-20 (RenatoGallicola): **#5 done** (PR #20): simulated windows of classes 2, 8, 9 added to
   the XGBoost training, scored on real wells only. Validation 0.221 → 0.244, CV by well 0.316 → 0.347
   (± 0.09-0.13): a weak positive inside the noise; class 9 0.02 → 0.09. Simulated instances never
   record P-ANULAR (possible shortcut).
-- 2026-11-21 (RenatoGallicola): **#4 done** (PR #18): same XGBoost model and windows, 5-fold CV on
+- 2026-11-20 (RenatoGallicola): **#4 done** (PR #18): same XGBoost model and windows, 5-fold CV on
   train+val: random split 0.84, by instance 0.71, by well 0.32 macro-F1. Chart in
   `results/split_leakage/split_leakage.png`, good for the posts.
-- 2026-11-21 (RenatoGallicola): **#15 done** (PR #17): `scripts/lead_time.py` scores windows slid
+- 2026-11-20 (RenatoGallicola): **#15 done** (PR #17): `scripts/lead_time.py` scores windows slid
   across the event onset (validation only, test frozen). XGBoost shape, class average: flagged as
   an event 0.18 at -30 min, 0.09 at onset, 0.37 at +15 min (false alarms 0.12). Clear early signal
   only for class 2 (0.00 before, 0.92 in the first 30 min, 2 instances) and partly class 9; class 4
