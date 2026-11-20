@@ -91,3 +91,14 @@ reported. The baselines write theirs with `scripts/baselines.py --predictions-di
 uv run python scripts/evaluate.py ..\data\windows results\predictions\xgboost_shape_val.csv --split val
 uv run python scripts/evaluate.py ..\data\windows A_test.csv --compare B_test.csv --split test --out results\eval.json
 ```
+
+## Perturbed windows (issue #3)
+`scripts/perturb.py make` writes one window folder per condition (`original`, `time_shuffle`,
+`noise_signal`, `signal_from_other`, `stats_from_other`, `no_stats`) in the same format, with two
+extra arrays in `{split}.npz`: `stats_mean` and `stats_std` (float32 `[N, 6]`), the mean and standard
+deviation that a TSLM prompt must show for each sensor. NaN means "do not show this statistic". In
+the conflict conditions `{split}.csv` also has `donor_label`.
+
+**The OpenTSLM bridge must take the prompt statistics from `stats_mean`/`stats_std` when they are in
+the file**, and compute them from `X` only when they are not. Otherwise the perturbations of the
+statistics have no effect.
