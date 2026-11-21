@@ -1,0 +1,45 @@
+{
+  "config": {
+    "run_name": "cv_f0_b05",
+    "windows": "fold0",
+    "base_checkpoint": "OpenTSLM/llama-3.2-1b-har-sp",
+    "epochs": 1,
+    "max_steps": 0,
+    "steps_per_epoch": 0,
+    "batch_size": 8,
+    "eval_batch_size": 32,
+    "max_val": 0,
+    "lr_encoder": 0.0002,
+    "lr_projector": 0.0001,
+    "lr_lora": 0.0001,
+    "balance_power": 0.5,
+    "sensor_dropout": true,
+    "seed": 0,
+    "repo_commit": "8fe05e43f1df9c5ee14ca4d6347d648e162f5d95",
+    "opentslm_commit": "2968f4b891baab4307f7e9d0043e87677b593a30",
+    "gpu": "A100"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "step": 1097,
+      "train_loss": 0.19504960797881354,
+      "val": {
+        "macro_f1": 0.3568711838339878,
+        "accuracy": 0.5689040689040689,
+        "unparseable": 0.0,
+        "per_class_f1": {
+          "0": 0.723,
+          "2": 0.963,
+          "4": 0.001,
+          "7": 0.031,
+          "8": 0.023,
+          "9": 0.4
+        }
+      },
+      "val_seconds": 104.2,
+      "minutes": 8.9
+    }
+  ],
+  "best_val_macro_f1": 0.3568711838339878
+}
