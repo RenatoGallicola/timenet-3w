@@ -9,7 +9,7 @@ time).
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | Next: #3 scoring (OpenTSLM perturbed predictions are on `main`), then the demo update, #11 README, post 1 | None |
-| ariannabalducci (Model and demo) | #9 (checked rationales from computed features), then #26 phase 2 (training with rationales, balancing 1.0) | None |
+| ariannabalducci (Model and demo) | Next (Sunday): #26 phase 3 decision, rationale examples for the demo (#10), results for #11 | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +25,14 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (ariannabalducci): **#9 done** (branch `issue/9-rationales`): `scripts/rationales.py` writes
+  rationales from the shown sensors (trend, step, oscillation, never the class) and checks every claim a
+  model writes. CV by well, balancing 1.0, 1 epoch, **with vs without rationales**: macro-F1 0.363 ± 0.086
+  vs 0.343 ± 0.029 (folds 0.387/0.435/0.267 vs 0.326/0.377/0.327), event recall 0.39 vs 0.43, **false
+  alarms 0.28 vs 0.14**: no robust gain. Rationale check (CV mean): hallucinated sensors 0.05%, wrong
+  direction 3%, numbers within tolerance 62%; it often says "stable" over a salient change. Class 4 is
+  visible almost only in the PCK sensors (0.5% "stable" rationales with them, 95% without). Rationale runs
+  need an A100-80GB (`TIMENET_GPU`).
 - 2026-11-21 (ariannabalducci): **#26 phase 1 done** (branch `issue/26-opentslm-cv`): OpenTSLM on the 3 folds by
   well, 1 epoch, balancing 0.5 / 0.75 / 1.0: macro-F1 0.340 / 0.351 / 0.343 (XGBoost shape 0.317), event
   recall 0.15 / 0.18 / 0.43 at false alarms 0.10 / 0.14 / 0.14 (XGBoost 0.39 / 0.14). **Balancing 1.0
