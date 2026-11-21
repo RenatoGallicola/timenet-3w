@@ -1,0 +1,167 @@
+{
+ "seed": 0,
+ "n_folds": 3,
+ "note": "train and validation wells of the connector split; test wells excluded",
+ "wells": {
+  "WELL-00001": 2,
+  "WELL-00002": 0,
+  "WELL-00004": 2,
+  "WELL-00006": 1,
+  "WELL-00007": 2,
+  "WELL-00009": 0,
+  "WELL-00010": 1,
+  "WELL-00011": 2,
+  "WELL-00012": 0,
+  "WELL-00013": 1,
+  "WELL-00015": 2,
+  "WELL-00016": 2,
+  "WELL-00019": 2,
+  "WELL-00020": 1,
+  "WELL-00021": 1,
+  "WELL-00023": 2,
+  "WELL-00024": 0,
+  "WELL-00025": 0,
+  "WELL-00026": 1,
+  "WELL-00027": 1,
+  "WELL-00028": 0,
+  "WELL-00029": 0,
+  "WELL-00031": 0,
+  "WELL-00033": 2,
+  "WELL-00034": 2,
+  "WELL-00036": 2,
+  "WELL-00037": 0,
+  "WELL-00039": 1,
+  "WELL-00040": 0,
+  "WELL-00041": 2,
+  "WELL-00042": 1
+ },
+ "folds": {
+  "fold0": {
+   "train_windows": 8783,
+   "held_out_windows": 6734,
+   "held_out_wells": [
+    "WELL-00002",
+    "WELL-00009",
+    "WELL-00012",
+    "WELL-00024",
+    "WELL-00025",
+    "WELL-00028",
+    "WELL-00029",
+    "WELL-00031",
+    "WELL-00037",
+    "WELL-00040"
+   ],
+   "held_out_by_class": {
+    "0": {
+     "windows": 4069,
+     "wells": 10
+    },
+    "2": {
+     "windows": 27,
+     "wells": 3
+    },
+    "4": {
+     "windows": 2128,
+     "wells": 1
+    },
+    "7": {
+     "windows": 380,
+     "wells": 1
+    },
+    "8": {
+     "windows": 80,
+     "wells": 4
+    },
+    "9": {
+     "windows": 50,
+     "wells": 2
+    }
+   }
+  },
+  "fold1": {
+   "train_windows": 11214,
+   "held_out_windows": 4303,
+   "held_out_wells": [
+    "WELL-00006",
+    "WELL-00010",
+    "WELL-00013",
+    "WELL-00020",
+    "WELL-00021",
+    "WELL-00026",
+    "WELL-00027",
+    "WELL-00039",
+    "WELL-00042"
+   ],
+   "held_out_by_class": {
+    "0": {
+     "windows": 2449,
+     "wells": 9
+    },
+    "2": {
+     "windows": 29,
+     "wells": 2
+    },
+    "4": {
+     "windows": 1577,
+     "wells": 1
+    },
+    "7": {
+     "windows": 80,
+     "wells": 2
+    },
+    "8": {
+     "windows": 80,
+     "wells": 2
+    },
+    "9": {
+     "windows": 88,
+     "wells": 1
+    }
+   }
+  },
+  "fold2": {
+   "train_windows": 11037,
+   "held_out_windows": 4480,
+   "held_out_wells": [
+    "WELL-00001",
+    "WELL-00004",
+    "WELL-00007",
+    "WELL-00011",
+    "WELL-00015",
+    "WELL-00016",
+    "WELL-00019",
+    "WELL-00023",
+    "WELL-00033",
+    "WELL-00034",
+    "WELL-00036",
+    "WELL-00041"
+   ],
+   "held_out_by_class": {
+    "0": {
+     "windows": 2462,
+     "wells": 12
+    },
+    "2": {
+     "windows": 106,
+     "wells": 1
+    },
+    "4": {
+     "windows": 1692,
+     "wells": 3
+    },
+    "7": {
+     "windows": 100,
+     "wells": 2
+    },
+    "8": {
+     "windows": 80,
+     "wells": 1
+    },
+    "9": {
+     "windows": 40,
+     "wells": 2
+    }
+   }
+  }
+ }
+}
