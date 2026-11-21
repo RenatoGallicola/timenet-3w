@@ -8,8 +8,8 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | #3 tool ready (PR #21); its OpenTSLM part waits for a model. Next: README draft (#11), post 1 | OpenTSLM model for the rest of #3 |
-| ariannabalducci (Model and demo) | PRs #23 (#7) and #24 (#8) open; next: demo (#10) | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #25 (3 folds by well for cross-validation, unblocks #26). Next: #22, #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
+| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | #25 folds |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
