@@ -1,0 +1,65 @@
+{
+  "config": {
+    "run_name": "run1",
+    "windows": "windows",
+    "base_checkpoint": "OpenTSLM/llama-3.2-1b-har-sp",
+    "epochs": 2,
+    "max_steps": 0,
+    "steps_per_epoch": 0,
+    "batch_size": 8,
+    "eval_batch_size": 32,
+    "max_val": 0,
+    "lr_encoder": 0.0002,
+    "lr_projector": 0.0001,
+    "lr_lora": 0.0001,
+    "balance_power": 1.0,
+    "sensor_dropout": true,
+    "seed": 0,
+    "repo_commit": "d6759fa44a3adf4ccbdf438ce97e3b80ae91401c",
+    "opentslm_commit": "2968f4b891baab4307f7e9d0043e87677b593a30",
+    "gpu": "A100"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "step": 1603,
+      "train_loss": 0.17632485582831608,
+      "val": {
+        "macro_f1": 0.5099610172410417,
+        "accuracy": 0.7550185873605948,
+        "unparseable": 0.0,
+        "per_class_f1": {
+          "0": 0.57,
+          "2": 0.615,
+          "4": 0.951,
+          "7": 0.246,
+          "8": 0.677,
+          "9": 0.0
+        }
+      },
+      "val_seconds": 59.3,
+      "minutes": 12.0
+    },
+    {
+      "epoch": 2,
+      "step": 3206,
+      "train_loss": 0.008914088931725028,
+      "val": {
+        "macro_f1": 0.36076708637684246,
+        "accuracy": 0.6661710037174721,
+        "unparseable": 0.0,
+        "per_class_f1": {
+          "0": 0.539,
+          "2": 0.5,
+          "4": 0.909,
+          "7": 0.0,
+          "8": 0.216,
+          "9": 0.0
+        }
+      },
+      "val_seconds": 60.8,
+      "minutes": 24.1
+    }
+  ],
+  "best_val_macro_f1": 0.5099610172410417
+}
