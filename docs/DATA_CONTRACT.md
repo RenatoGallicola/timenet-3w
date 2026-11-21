@@ -102,3 +102,18 @@ the conflict conditions `{split}.csv` also has `donor_label`.
 **The OpenTSLM bridge must take the prompt statistics from `stats_mean`/`stats_std` when they are in
 the file**, and compute them from `X` only when they are not. Otherwise the perturbations of the
 statistics have no effect.
+
+## Folds by well for cross-validation (issue #25)
+The train and validation wells of the connector split are assigned to 3 folds by well
+(`splits/folds_by_well.json`); the test wells are left out. Every event class has windows in every
+held-out fold, but class 4 comes from a single well in two folds. Build the fold folders from the
+windows with:
+
+```powershell
+uv run python scripts/make_folds.py ..\data\windows ..\data\folds --xgboost
+```
+
+Each `..\data\folds\fold<k>\` holds `train` (the other two folds) and `val` (the held-out wells of
+fold k), in the format above, with no `test`. Compare models by the **mean** over the 3 folds. The
+XGBoost `shape` reference on the same folds is in `results/folds/xgboost_shape_folds.json`:
+macro-F1 0.317 ± 0.031 (folds 0.28, 0.32, 0.35).
