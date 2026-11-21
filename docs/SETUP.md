@@ -46,7 +46,9 @@ The TimeNet fork is only needed by whoever works on the connector.
 2. Request access to https://huggingface.co/meta-llama/Llama-3.2-1B (button at the top of the
    page). Approval can take a few hours: do this first.
 3. Accept the Gemma license at https://huggingface.co/google/gemma-3-1b-pt
-4. Create a token: Settings → Access Tokens → New token, type **Read**.
+4. Create a token: Settings → Access Tokens → New token, type **Write** (needed to upload checkpoints
+   to the team's private model repo; Read only downloads). Ask to join the `timenet-3w` organization,
+   which holds the private model repo.
 
 ### Modal (GPUs for training)
 1. Sign up at https://modal.com with your GitHub account.
@@ -54,8 +56,9 @@ The TimeNet fork is only needed by whoever works on the connector.
    the **spend limit to 0** (or the minimum allowed). You then use only the free $30 a month and
    never pay.
 3. Use your own workspace: the $30 are per workspace, so do not join the other member's.
-4. Connect the terminal with `uvx modal token new` (or `uv run modal token new` once `modal` is a
-   project dependency).
+4. Create a token (`uvx modal token new`, or Settings → API Tokens) and put its id and secret in
+   `.env` as `MODAL_TOKEN_ID` and `MODAL_TOKEN_SECRET` (step 5): `scripts/opentslm_modal.py` reads them
+   from there.
 
 ### Kaggle (backup GPUs)
 1. Sign up at https://www.kaggle.com
@@ -93,10 +96,12 @@ path in `.env` as `THREEW_DATASET_DIR`, for example
 ## 7. Build the TimeNet dataset and the windows
 The training windows come from the `petrobras/three-w` TimeNet dataset built by our connector. Build
 it once (it downloads 3W from the pinned URLs and checks every SHA-256: about 20 minutes, 1.1 GB on
-disk), then cut the windows. Both commands create their folders next to the repo, outside git:
+disk), then cut the windows. Both commands create their folders next to the repo, outside git.
+`--no-isolation` is required: an isolated build installs `timenet-connectors` from PyPI, which has no
+3W connector yet.
 ```powershell
 cd $HOME\Desktop\TimeNet\timenet-3w
-uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --local-registry ..\registry
+uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --no-isolation --local-registry ..\registry
 uv run python scripts/make_windows.py ..\registry ..\data\windows --splits splits/wells_connector.json
 ```
 See `docs/DATA_CONTRACT.md` for the window format.
