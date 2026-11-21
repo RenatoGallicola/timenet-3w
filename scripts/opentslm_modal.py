@@ -58,7 +58,7 @@ import modal  # noqa: E402  (after .env, so Modal finds its token)
 
 OPENTSLM_COMMIT = "2968f4b891baab4307f7e9d0043e87677b593a30"
 BASE_CHECKPOINT = "OpenTSLM/llama-3.2-1b-har-sp"
-GPU = "A100"
+GPU = os.environ.get("TIMENET_GPU", "A100")  # A100-80GB for rationale runs that run out of memory
 LABEL_TOKENS = 12
 RATIONALE_TOKENS = 192  # the longest computed rationale is 53 words, numbers split into many tokens
 

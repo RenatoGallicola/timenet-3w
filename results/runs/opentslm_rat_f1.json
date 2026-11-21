@@ -1,0 +1,46 @@
+{
+  "config": {
+    "run_name": "rat_f1",
+    "windows": "fold1",
+    "base_checkpoint": "OpenTSLM/llama-3.2-1b-har-sp",
+    "epochs": 1,
+    "max_steps": 0,
+    "steps_per_epoch": 0,
+    "batch_size": 8,
+    "eval_batch_size": 32,
+    "max_val": 0,
+    "lr_encoder": 0.0002,
+    "lr_projector": 0.0001,
+    "lr_lora": 0.0001,
+    "balance_power": 1.0,
+    "sensor_dropout": true,
+    "rationales": true,
+    "seed": 0,
+    "repo_commit": "7e342fd9f0ffe93b2b4201dee63491cd18dab0ef",
+    "opentslm_commit": "2968f4b891baab4307f7e9d0043e87677b593a30",
+    "gpu": "A100-80GB"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "step": 1401,
+      "train_loss": 0.17883982240946314,
+      "val": {
+        "macro_f1": 0.4346053399086389,
+        "accuracy": 0.6639553799674646,
+        "unparseable": 0.0,
+        "per_class_f1": {
+          "0": 0.774,
+          "2": 0.766,
+          "4": 0.478,
+          "7": 0.0,
+          "8": 0.52,
+          "9": 0.07
+        }
+      },
+      "val_seconds": 238.2,
+      "minutes": 14.2
+    }
+  ],
+  "best_val_macro_f1": 0.4346053399086389
+}
