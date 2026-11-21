@@ -9,7 +9,7 @@ time).
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | Next: #3 scoring (OpenTSLM perturbed predictions are on `main`), then the demo update, #11 README, post 1 | None |
-| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal); between those runs, #29 (OpenTSLM run 1 on the perturbed windows, for #3); while they train, #9 (rationales) | None: folds ready (#25) |
+| ariannabalducci (Model and demo) | #9 (checked rationales from computed features), then #26 phase 2 (training with rationales, balancing 1.0) | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +25,12 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (ariannabalducci): **#26 phase 1 done** (branch `issue/26-opentslm-cv`): OpenTSLM on the 3 folds by
+  well, 1 epoch, balancing 0.5 / 0.75 / 1.0: macro-F1 0.340 / 0.351 / 0.343 (XGBoost shape 0.317), event
+  recall 0.15 / 0.18 / 0.43 at false alarms 0.10 / 0.14 / 0.14 (XGBoost 0.39 / 0.14). **Balancing 1.0
+  kept** (see `docs/DECISIONS.md`). Fold 0 misses almost all events (class 4 from one unseen well).
+- 2026-11-21 (ariannabalducci): **#29 done** (PR #30): OpenTSLM run 1 predictions on the 6 perturbed conditions,
+  val and test; `original` identical to run 1.
 - 2026-11-21 (RenatoGallicola): **#10 done** (PR #31): demo live at
   https://huggingface.co/spaces/timenet-3w/3w-on-timenet (free static Space). Explorer of test
   windows with both models' answers, test results, split leakage, lead time, perturbation check.
