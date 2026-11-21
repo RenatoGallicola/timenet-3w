@@ -2140,7 +2140,7 @@ wheels = [
 [[package]]
 name = "timenet"
 version = "0.12.0"
-source = { git = "https://github.com/OpenTSLM/TimeNet?subdirectory=packages%2Ftimenet&rev=7ad336b394b287e09990654e8e78f38e7530d8a7#7ad336b394b287e09990654e8e78f38e7530d8a7" }
+source = { git = "https://github.com/OpenTSLM/TimeNet?subdirectory=packages%2Ftimenet&rev=df1d9d67d84c9e87434b3c2ab5306fd84233e010#df1d9d67d84c9e87434b3c2ab5306fd84233e010" }
 dependencies = [
     { name = "cachetools" },
     { name = "duckdb" },
@@ -2179,7 +2179,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2" },
     { name = "pyarrow", specifier = ">=15" },
     { name = "scikit-learn", specifier = ">=1.4" },
-    { name = "timenet", git = "https://github.com/OpenTSLM/TimeNet?subdirectory=packages%2Ftimenet&rev=7ad336b394b287e09990654e8e78f38e7530d8a7" },
+    { name = "timenet", git = "https://github.com/OpenTSLM/TimeNet?subdirectory=packages%2Ftimenet&rev=df1d9d67d84c9e87434b3c2ab5306fd84233e010" },
     { name = "xgboost", specifier = ">=2.0" },
 ]
 

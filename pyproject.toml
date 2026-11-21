@@ -17,4 +17,4 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-timenet = { git = "https://github.com/OpenTSLM/TimeNet", subdirectory = "packages/timenet", rev = "7ad336b394b287e09990654e8e78f38e7530d8a7" }
+timenet = { git = "https://github.com/OpenTSLM/TimeNet", subdirectory = "packages/timenet", rev = "df1d9d67d84c9e87434b3c2ab5306fd84233e010" }

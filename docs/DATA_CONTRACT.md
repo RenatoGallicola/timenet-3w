@@ -11,8 +11,9 @@ With `--source parquet` it reads the 3W Parquet files directly. `scripts/compare
 on 2026-11-20 that both sources give the same 18,737 windows, value for value.
 
 ```powershell
-# Build the TimeNet dataset once (downloads 3W, about 20 minutes, 1.1 GB)
-uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --local-registry ..\registry
+# Build the TimeNet dataset once (downloads 3W, about 20 minutes, 1.2 GB);
+# --no-isolation uses the fork's connector instead of the PyPI release, which has none for 3W
+uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --no-isolation --local-registry ..\registry
 # Cut the windows from it, with the connector's split
 uv run python scripts/make_windows.py ..\registry ..\data\windows --splits splits/wells_connector.json
 ```
