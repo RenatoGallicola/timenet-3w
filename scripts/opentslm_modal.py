@@ -19,7 +19,9 @@ Training follows the plan of issue #8 and docs/DECISIONS.md:
   OpenTSLM curriculum, linear warmup and decay, gradient clipping;
 - samples come from `scripts/opentslm_bridge.py`: present sensors only, random sensor dropout,
   class-balanced sampling;
-- the answer is the class name alone (run 1, no rationales);
+- the answer is the class name alone (run 1), or with `--rationales` "<rationale> Answer: <state>",
+  the rationale computed from the shown sensors by `scripts/rationales.py` (issue #9); predictions
+  then hold the whole generated text, which `scripts/rationales.py --check-file` checks;
 - after every epoch the model generates answers for the **validation** windows, scored with the
   parser of `scripts/evaluate.py`; the best epoch by validation macro-F1 is kept. The test windows
   are never used here: `predict --split test` runs once, at the end.
@@ -56,7 +58,9 @@ import modal  # noqa: E402  (after .env, so Modal finds its token)
 
 OPENTSLM_COMMIT = "2968f4b891baab4307f7e9d0043e87677b593a30"
 BASE_CHECKPOINT = "OpenTSLM/llama-3.2-1b-har-sp"
-GPU = "A100"
+GPU = os.environ.get("TIMENET_GPU", "A100")  # A100-80GB for rationale runs that run out of memory
+LABEL_TOKENS = 12
+RATIONALE_TOKENS = 192  # the longest computed rationale is 53 words, numbers split into many tokens
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -73,6 +77,7 @@ image = (
     .env({"HF_HOME": "/hf-cache", "TOKENIZERS_PARALLELISM": "false"})
     .add_local_file(REPO / "scripts" / "opentslm_bridge.py", "/root/opentslm_bridge.py")
     .add_local_file(REPO / "scripts" / "evaluate.py", "/root/evaluate.py")
+    .add_local_file(REPO / "scripts" / "rationales.py", "/root/rationales.py")
 )
 
 app = modal.App("timenet-3w-opentslm", image=image)
@@ -182,8 +187,11 @@ def train_remote(cfg: dict) -> dict:
 
     model = _build_model(cfg["base_checkpoint"])
     eos = model.get_eos_token()
-    train_ds = ThreeWQADataset(windows, "train", eos_token=eos, sensor_dropout=cfg["sensor_dropout"], seed=cfg["seed"])
-    val_ds = ThreeWQADataset(windows, "val")
+    mode = "auto" if cfg.get("rationales") else None
+    train_ds = ThreeWQADataset(windows, "train", eos_token=eos, sensor_dropout=cfg["sensor_dropout"],
+                               seed=cfg["seed"], rationales=mode)
+    val_ds = ThreeWQADataset(windows, "val", rationales=mode)
+    max_new = RATIONALE_TOKENS if mode else LABEL_TOKENS
     if cfg["max_val"]:
         idx = np.random.default_rng(0).permutation(len(val_ds))[: cfg["max_val"]]
         val_subset = torch.utils.data.Subset(val_ds, sorted(idx.tolist()))
@@ -231,7 +239,7 @@ def train_remote(cfg: dict) -> dict:
                 break
 
         t0 = time.time()
-        answers = _predict_dataset(model, val_subset, cfg["eval_batch_size"])
+        answers = _predict_dataset(model, val_subset, cfg["eval_batch_size"], max_new)
         scores = _score(answers, val_y, val_ds.names)
         entry = {"epoch": epoch + 1, "step": step, "train_loss": running / max(n, 1),
                  "val": scores, "val_seconds": round(time.time() - t0, 1),
@@ -254,7 +262,7 @@ def train_remote(cfg: dict) -> dict:
 
 @app.function(gpu=GPU, volumes=VOLUMES, secrets=[HF_SECRET], timeout=3 * 3600)
 def predict_remote(run_name: str, windows: str, split: str, base_checkpoint: str,
-                   hf_repo: str, batch_size: int) -> list[dict]:
+                   hf_repo: str, batch_size: int, rationales: bool = False) -> list[dict]:
     sys.path.insert(0, "/root")
     from opentslm_bridge import ThreeWQADataset
 
@@ -265,8 +273,8 @@ def predict_remote(run_name: str, windows: str, split: str, base_checkpoint: str
     else:
         ckpt = str(Path("/runs") / run_name / "best.pt")
     model = _build_model(base_checkpoint, ckpt)
-    ds = ThreeWQADataset(Path("/data") / windows, split)
-    answers = _predict_dataset(model, ds, batch_size)
+    ds = ThreeWQADataset(Path("/data") / windows, split, rationales="auto" if rationales else None)
+    answers = _predict_dataset(model, ds, batch_size, RATIONALE_TOKENS if rationales else LABEL_TOKENS)
     print(json.dumps(_score(answers, ds.y, ds.names)), flush=True)
     return [{"window_id": w, "prediction": a} for w, a in zip(ds.rows.window_id, answers)]
 
@@ -316,13 +324,13 @@ def train(run_name: str, windows: str = "windows", base_checkpoint: str = BASE_C
           epochs: int = 2, max_steps: int = 0, steps_per_epoch: int = 0, batch_size: int = 8,
           eval_batch_size: int = 32, max_val: int = 0, lr_encoder: float = 2e-4,
           lr_projector: float = 1e-4, lr_lora: float = 1e-4, balance_power: float = 1.0,
-          no_dropout: bool = False, seed: int = 0):
+          no_dropout: bool = False, rationales: bool = False, seed: int = 0):
     cfg = {
         "run_name": run_name, "windows": windows, "base_checkpoint": base_checkpoint,
         "epochs": epochs, "max_steps": max_steps, "steps_per_epoch": steps_per_epoch,
         "batch_size": batch_size, "eval_batch_size": eval_batch_size, "max_val": max_val,
         "lr_encoder": lr_encoder, "lr_projector": lr_projector, "lr_lora": lr_lora,
-        "balance_power": balance_power, "sensor_dropout": not no_dropout, "seed": seed,
+        "balance_power": balance_power, "sensor_dropout": not no_dropout, "rationales": rationales, "seed": seed,
         "repo_commit": _git_commit(), "opentslm_commit": OPENTSLM_COMMIT, "gpu": GPU,
     }
     result = train_remote.remote(cfg)
@@ -334,13 +342,14 @@ def train(run_name: str, windows: str = "windows", base_checkpoint: str = BASE_C
 
 @app.local_entrypoint()
 def predict(run_name: str = "", windows: str = "windows", split: str = "val", out: str = "",
-            base_checkpoint: str = BASE_CHECKPOINT, hf_repo: str = "", batch_size: int = 32):
+            base_checkpoint: str = BASE_CHECKPOINT, hf_repo: str = "", batch_size: int = 32,
+            rationales: bool = False):
     if not run_name and not hf_repo:
         raise SystemExit("give --run-name or --hf-repo")
     if split == "test":
         print("NOTE: test split. Run it once, on the final model only (docs/DECISIONS.md).")
     rows = predict_remote.remote(
-        run_name, windows, split, base_checkpoint, hf_repo, batch_size
+        run_name, windows, split, base_checkpoint, hf_repo, batch_size, rationales
     )
     name = out or f"opentslm_{run_name or hf_repo.split('/')[-1]}_{windows.replace('/', '_')}_{split}"
     path = REPO / "results" / "predictions" / f"{name}.csv"
