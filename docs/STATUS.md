@@ -8,8 +8,8 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | Predictions on the perturbed folders need a Modal run (ariannabalducci, or a Modal account for RenatoGallicola) |
-| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | None: folds ready (#25) |
+| RenatoGallicola (Data and TimeNet) | Next: #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | #3 waits for #29 |
+| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal); between those runs, #29 (OpenTSLM run 1 on the perturbed windows, for #3); while they train, #9 (rationales) | None: folds ready (#25) |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
