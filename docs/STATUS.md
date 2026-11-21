@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #22 (setup fixes). Next: #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
+| RenatoGallicola (Data and TimeNet) | Next: #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | Predictions on the perturbed folders need a Modal run (ariannabalducci, or a Modal account for RenatoGallicola) |
 | ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | None: folds ready (#25) |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,11 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (RenatoGallicola): **#22 done** (PR #28): `--no-isolation` in the build commands,
+  `.env.example` tracked (with the Modal tokens), Write token for Hugging Face, and `timenet` pinned to
+  upstream `df1d9d67`, the reader of the connector version that the maintainer masquare pushed to the
+  PR branch (new connector API, control schema v3). Windows from the rebuilt dataset are identical.
+  **Both: run `uv sync` after pulling.**
 - 2026-11-21 (RenatoGallicola): **#25 done** (PR #27): 3 folds by well over the train and
   validation wells (`splits/folds_by_well.json`, `scripts/make_folds.py`); every event class in every
   held-out fold. XGBoost shape reference on the folds: macro-F1 0.317 ± 0.031.
