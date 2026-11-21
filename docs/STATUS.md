@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #22 (setup fixes), #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #22 (setup fixes). Next: #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
 | ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | None: folds ready (#25) |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
