@@ -8,7 +8,7 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #10 (static demo on a Hugging Face Space of the timenet-3w organization). Next: #3 scoring after #29, #11 README, post 1 | #3 waits for #29 |
+| RenatoGallicola (Data and TimeNet) | Next: #3 scoring (OpenTSLM perturbed predictions are on `main`), then the demo update, #11 README, post 1 | None |
 | ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal); between those runs, #29 (OpenTSLM run 1 on the perturbed windows, for #3); while they train, #9 (rationales) | None: folds ready (#25) |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -25,6 +25,10 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (RenatoGallicola): **#10 done** (PR #31): demo live at
+  https://huggingface.co/spaces/timenet-3w/3w-on-timenet (free static Space). Explorer of test
+  windows with both models' answers, test results, split leakage, lead time, perturbation check.
+  To update it: `scripts/export_demo.py`, then upload `demo/` with a Write `HF_TOKEN` in `.env`.
 - 2026-11-21 (RenatoGallicola): **#22 done** (PR #28): `--no-isolation` in the build commands,
   `.env.example` tracked (with the Modal tokens), Write token for Hugging Face, and `timenet` pinned to
   upstream `df1d9d67`, the reader of the connector version that the maintainer masquare pushed to the
