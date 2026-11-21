@@ -8,8 +8,8 @@ time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #25 (3 folds by well for cross-validation, unblocks #26). Next: #22, #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
-| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | #25 folds |
+| RenatoGallicola (Data and TimeNet) | Next: #22 (setup fixes), #3 on OpenTSLM run 1, #10 demo, #11 README, post 1 | None |
+| ariannabalducci (Model and demo) | #26 (OpenTSLM cross-validation by well, runs detached on Modal) and, while they train, #9 (rationales) | None: folds ready (#25) |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +25,9 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-21 (RenatoGallicola): **#25 done** (PR #27): 3 folds by well over the train and
+  validation wells (`splits/folds_by_well.json`, `scripts/make_folds.py`); every event class in every
+  held-out fold. XGBoost shape reference on the folds: macro-F1 0.317 ± 0.031.
 - 2026-11-21 (ariannabalducci): **OpenTSLM run 1 on test** (run once, PR #24): macro-F1 **0.349**
   against 0.403 for XGBoost shape (paired -0.05, CI -0.16 to 0.02); **false alarms 0.59**: 1,000 of
   1,805 normal test windows are called scaling in PCK, and no flow-instability window of the two
