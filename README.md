@@ -8,7 +8,7 @@ Project for the [TimeNet Online Hackathon](https://challenge.timenet.ai/), Round
 | | |
 |---|---|
 | **TimeNet PR** | [OpenTSLM/TimeNet#833](https://github.com/OpenTSLM/TimeNet/pull/833): Petrobras 3W as the `petrobras/three-w` dataset, in TimeNet's `industrial` domain |
-| **Demo** | [huggingface.co/spaces/timenet-3w/3w-on-timenet](https://huggingface.co/spaces/timenet-3w/3w-on-timenet): test windows with both models' answers and every result below |
+| **Demo** | [huggingface.co/spaces/timenet-3w/3w-on-timenet](https://huggingface.co/spaces/timenet-3w/3w-on-timenet): test windows with both models' answers, the test results, split leakage and lead time |
 | **Data** | [Petrobras 3W](https://github.com/petrobras/3W) v2.0.0, CC BY 4.0 |
 
 ## In short
@@ -17,16 +17,15 @@ Project for the [TimeNet Online Hackathon](https://challenge.timenet.ai/), Round
   files and builds 2,228 classification tasks and 1,142 event-localization tasks. Missing sensors are
   declared, never filled.
 - **We evaluate by well, not by window.** On the same model and windows, macro-F1 is 0.84 with a
-  random split, 0.71 when we split by instance and **0.32 when we split by well**. Most published 3W
-  numbers come from the first two settings.
-- **OpenTSLM fine-tuned on 3W does not beat a tuned XGBoost on unseen wells.** On the held-out test
+  random split, 0.71 when we split by instance and **0.32 when we split by well**. Only the last one
+  measures what happens on a new well.
+- **OpenTSLM fine-tuned on 3W does not beat an XGBoost baseline on unseen wells.** On the held-out test
   wells it scores 0.35 macro-F1 against 0.40 (paired difference −0.05, CI −0.16 to 0.02). Under
-  cross-validation by well the two are tied (0.34 ± 0.03 against 0.32 ± 0.03). It is better on some
-  classes and worse on others, and on test it raises many more false alarms.
+  cross-validation by well the two are tied (0.34 ± 0.03 against 0.32 ± 0.03). On test it raises many more false alarms.
 - **OpenTSLM does read the signal, but it leans on the statistics in its prompt.** Shuffling the time
   order while leaving the prompt's mean and std untouched drops validation macro-F1 from 0.51 to
-  0.19. When the signal and the statistics point to different classes, the answer follows the
-  statistics twice as often as the signal.
+  0.19. On validation, when the signal and the statistics point to different classes, the answer
+  follows the statistics about twice as often as the signal (on test the conflict is inconclusive).
 - **Explanations are checked, not trusted.** A second model writes a short description of what the
   sensors did, then answers. A script re-measures every claim against the data: 0.05% of claims name
   a sensor that is not there and 3% give the wrong direction of change. These explanations do not
@@ -77,9 +76,10 @@ project:
 
 1. **Shortcut: which sensors exist.** Each well has different sensors, so without countermeasures
    the model learns sensor presence. On new wells it then recognized 0 flow-instability windows.
-   Random sensor dropout during training fixed it (F1 0.6). Absolute levels are left out.
-2. **Mean and std alone are almost as good as shape features.** OpenTSLM writes exactly those numbers
-   into its prompt, so it needs perturbation tests (below).
+   Random sensor dropout during training fixed it (class F1 0.50 on the test wells). Absolute levels
+   are left out.
+2. **Mean and std alone carry much of the signal**: 0.37 against 0.38 for shape features in 5-fold
+   CV by well (but 0.26 against 0.40 on test). OpenTSLM writes exactly those numbers into its prompt, so it needs perturbation tests (below).
 
 **OpenTSLM** (`scripts/opentslm_bridge.py`, `scripts/opentslm_modal.py`): OpenTSLM-SoftPrompt on
 Llama 3.2 1B. Training starts from the published `OpenTSLM/llama-3.2-1b-har-sp` checkpoint, which was
@@ -91,8 +91,8 @@ sample:
 
 The model is trained with fully class-balanced sampling and random sensor dropout. The encoder,
 projector and LoRA adapters are trained; the LLM stays frozen. Two epochs on an A100 (about 12 minutes
-each) on Modal's free credits; epoch 1 was kept, on validation macro-F1. The checkpoint and the settings were chosen on validation wells
-only. The test wells were frozen from 2026-11-20 and scored once.
+each) on Modal's free credits; epoch 1 was kept, on validation macro-F1. The checkpoint and the
+settings were chosen on validation wells only. The test wells were frozen from 2026-11-20 and scored once.
 
 **Checked explanations** (`scripts/rationales.py`): for every training window a script writes what
 the shown sensors did, never mentioning the class. For example:
@@ -127,12 +127,12 @@ Same XGBoost model and windows, 5-fold cross-validation on train and validation:
 
 | Model | Macro-F1 | Event recall | False alarms |
 |---|---|---|---|
-| XGBoost, mean and std | 0.26 | | |
+| XGBoost, mean and std | 0.26 | 0.05 | 0.03 |
 | XGBoost, shape features | **0.40** | 0.34 | **0.09** |
 | OpenTSLM run 1 | 0.35 | **0.37** | 0.59 |
 
 The paired bootstrap over instances gives OpenTSLM − XGBoost = −0.05 (CI −0.16 to 0.02). Per class
-(F1, with the number of test wells):
+(F1, with the number of test wells and instances):
 
 | Class | Wells | Instances | XGBoost | OpenTSLM |
 |---|---|---|---|---|
@@ -143,8 +143,9 @@ The paired bootstrap over instances gives OpenTSLM − XGBoost = −0.05 (CI −
 | 8 Hydrate in production line | 2 | 2 | 0.07 | 0.28 |
 | 9 Hydrate in service line | 1 | 3 | 0.00 | 0.48 |
 
-In the test split, classes 2, 7 and 9 come from one well each, so per-class numbers rest on 1 to 3
-events. OpenTSLM called 1,000 of the 1,805 normal test windows "Scaling in PCK" and recognized no
+In the test split, classes 2, 7 and 9 come from one well each, so per-class numbers rest on 2 to 8
+instances from one well. OpenTSLM's edge on classes 8 and 9 rests on 1 to 2 wells and is not evidence
+that it generalizes. OpenTSLM called 1,000 of the 1,805 normal test windows "Scaling in PCK" and recognized no
 flow-instability window. On validation it had scored 0.51 against 0.22 for XGBoost, but that gain did
 not transfer: validation flow instability came from a single well.
 
@@ -156,8 +157,10 @@ not transfer: validation flow instability came from a single well.
 | OpenTSLM, balancing 1.0 | 0.343 ± 0.029 | 0.43 | 0.14 |
 | OpenTSLM with explanations | 0.363 ± 0.086 | 0.39 | 0.28 |
 
-Class-balancing powers 0.5, 0.75 and 1.0 tie on macro-F1 (0.340, 0.351, 0.343). We kept 1.0 for its
-event recall (0.43 against 0.15 to 0.18 at the same false-alarm rate). Explanations do not give a
+The fold split is the one of `splits/folds_by_well.json`; the 5-fold figure of the split-leakage chart
+(0.32) and of `results/baselines.json` (0.38 ± 0.13) use other folds. Class-balancing powers 0.5, 0.75
+and 1.0 tie on macro-F1 (0.340, 0.351, 0.343). We kept 1.0 for its event recall (0.43 against 0.15 to
+0.18 at similar false-alarm rates, 0.10 to 0.15). Explanations do not give a
 robust gain (one fold worse) and double the false alarms, so the classifier stays label-only.
 
 ### Does OpenTSLM read the signal? (`results/perturbation/`)
@@ -175,19 +178,24 @@ into the prompt as text. Each perturbation breaks one channel:
 | signal from another class | other class | own | 0.26 | 0.16 |
 | statistics from another class | own | other class | 0.11 | 0.12 |
 
-Every drop from `original` has a paired bootstrap interval entirely below zero. On validation, time shuffle
-costs −0.32 (CI −0.40 to −0.18), so the model uses the temporal shape. It is not just reading the
+Every drop from `original` has a paired bootstrap interval entirely below zero. On validation, time
+shuffle costs −0.32 (CI −0.40 to −0.18), so the model uses the temporal shape. It is not just reading the
 numbers in the prompt.
 
 In the two conflict conditions, does the answer follow the window's own class or the class of the
-part that was swapped in (validation)?
+part that was swapped in?
 
-| Condition | Follows the statistics | Follows the signal |
-|---|---|---|
-| signal from another class | 0.45 | 0.19 |
-| statistics from another class | 0.41 | 0.16 |
+| Condition | Split | Follows the statistics | Follows the signal |
+|---|---|---|---|
+| signal from another class | validation | 0.45 | 0.19 |
+| statistics from another class | validation | 0.41 | 0.16 |
+| signal from another class | test | 0.25 | 0.18 |
+| statistics from another class | test | 0.18 | 0.24 |
 
-When the two channels disagree, the statistics win about twice as often as the signal. When the
+The rest of the answers name a third class. On validation, when the two channels disagree, the
+statistics win about twice as often as the signal (the unperturbed answers matched the swapped-in
+class only 7% of the time, so this is not chance). On test the conflict is inconclusive: the model
+is weaker there, and its unperturbed answers already matched the swapped-in class 27% of the time. When the
 signal carries no information, the model falls back to one default answer: "Normal operation" on
 validation, "Scaling in PCK" on test. XGBoost shape features, which see only the series, drop from
 0.22 to 0.06 under time shuffle on validation and from 0.39 to 0.14 on test (retrained, so 0.39 instead
@@ -199,11 +207,13 @@ of 0.40), and the statistics-only XGBoost does not move.
 |---|---|
 | Names a sensor that is not shown | 0.05% |
 | Wrong direction of change | 3% |
-| Number within tolerance | 62% |
+| Fully correct (sensor, direction, numbers) | 62% |
 
-The most common error is calling a salient change "stable". Flow instability is visible almost only
-in the sensors at the production choke (PCK): with them 0.5% of its rationales say "stable", without
-them 95%.
+Most errors are wrong numbers; the model also often calls a salient change "stable" (about 1,400
+claims per fold). A property of the data shows the limit of these descriptions: in the training
+windows of flow instability, the reference rationales say "all shown sensors are stable" for 0.5% of
+the wells that record a sensor at the production choke (`P-MON-CKP` or `T-JUS-CKP`) and for 95% of
+those that do not.
 
 ### Other results
 
@@ -221,7 +231,10 @@ them 95%.
   with which wells land in test. The validation gain of OpenTSLM (0.51) disappeared on test (0.35).
 - The bootstrap resamples instances, and windows of one well stay correlated, so read every interval
   as optimistic. We do not bootstrap over wells: there are too few.
-- One epoch, one backbone (1B), one architecture (SoftPrompt). Flamingo, larger backbones and
+- XGBoost uses fixed hyperparameters, and some of its feature choices were made after seeing test
+  numbers, before the test wells were frozen on 2026-11-20 (`docs/DECISIONS.md`). This favours the
+  baseline.
+- One kept epoch, one backbone (1B), one architecture (SoftPrompt). Flamingo, larger backbones and
   ensembles were planned but not run.
 - The explanations are descriptions of the signal that are checked against the data. They are not
   causal explanations of the event.
@@ -240,10 +253,14 @@ uv run python scripts/evaluate.py ..\data\windows results\predictions\opentslm_s
 # OpenTSLM on Modal (A100)
 uvx modal run scripts/opentslm_modal.py::upload --src ..\data\windows --name windows
 uvx modal run scripts/opentslm_modal.py::train --run-name run1 --epochs 2
-uvx modal run scripts/opentslm_modal.py::predict --run-name run1 --windows windows --split test
+uvx modal run scripts/opentslm_modal.py::predict --run-name run1 --windows windows --split test --out opentslm_sp_run1_test
 
 # Perturbation tests
 uv run python scripts/perturb.py make ..\data\windows ..\data\perturbed --split test
+# for each condition <c> (original, time_shuffle, noise_signal, signal_from_other, stats_from_other, no_stats):
+uvx modal run scripts/opentslm_modal.py::upload --src ..\data\perturbed\<c> --name <c>
+uvx modal run scripts/opentslm_modal.py::predict --run-name run1 --windows <c> --split test --out opentslm_sp_run1_<c>_test
+uv run python scripts/perturb.py xgboost ..\data\windows ..\data\perturbed --split test   # writes ..\data\perturbed\xgboost_test.json
 uv run python scripts/perturb.py score ..\data\perturbed results\perturbation --predictions results\predictions\opentslm_sp_run1 --split test
 
 # Folds by well, split leakage, rationales
