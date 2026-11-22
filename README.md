@@ -195,7 +195,15 @@ part that was swapped in?
 The rest of the answers name a third class. On validation, when the two channels disagree, the
 statistics win about twice as often as the signal (the unperturbed answers matched the swapped-in
 class only 7% of the time, so this is not chance). On test the conflict is inconclusive: the model
-is weaker there, and its unperturbed answers already matched the swapped-in class 27% of the time. When the
+is weaker there, and its unperturbed answers already matched the swapped-in class 27% of the time.
+
+The validation result matches an independent probe of the published `OpenTSLM/llama-3.2-1b-har-sp`
+checkpoint on human activity recognition, which uses the same conditions
+([opentslm-signal-probe](https://github.com/ariannabalducci/opentslm-signal-probe)). There, the
+answer follows the statistics 2.2 to 2.5 times as often as the series, and shuffling time costs
+about as much as replacing the series with noise. That model was trained on teacher rationales; ours
+answers with the label only. The preference survives without rationales, but our model starts from
+that checkpoint and may have inherited it. When the
 signal carries no information, the model falls back to one default answer: "Normal operation" on
 validation, "Scaling in PCK" on test. XGBoost shape features, which see only the series, drop from
 0.22 to 0.06 under time shuffle on validation and from 0.39 to 0.14 on test (retrained, so 0.39 instead
