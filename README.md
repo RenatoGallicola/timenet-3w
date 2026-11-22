@@ -229,6 +229,14 @@ those that do not.
   and 9 to the XGBoost training moves CV macro-F1 from 0.316 to 0.347 (± 0.09 to 0.13). The gain is
   weak and inside the noise. Simulated instances never record `P-ANULAR`, which is a possible
   shortcut.
+- **Per-well normalization** (`scripts/well_norm.py`, XGBoost, 3 folds by well; rule fixed before
+  the run in `docs/DECISIONS.md`): expressing each window's mean and std relative to its own well
+  (median over all its windows, no labels) **hurts**. Shape features drop from 0.317 to 0.269 when the
+  per-well levels are added. Relative mean and std reach only 0.14, while absolute mean and std reach
+  0.34; spurious DHSV closure falls from 0.78 to 0.01-0.22. The absolute levels carry physics that
+  transfers across wells, for example a pressure falling to a typical value when a valve closes, so
+  they are not just a well-specific shortcut. A reference built from all of a well's windows also
+  includes its events. Because XGBoost did not improve, the OpenTSLM run was not launched.
 - **Lead time** (`scripts/lead_time.py`, XGBoost only, validation): windows slid across the event
   onset. A clear early signal appears only for class 2. We did not run it for OpenTSLM, so **we make
   no early-warning claim**.
