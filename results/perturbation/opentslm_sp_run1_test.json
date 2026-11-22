@@ -1,0 +1,181 @@
+{
+ "original": {
+  "macro_f1": 0.3486,
+  "event_recall": 0.3682,
+  "false_alarm_rate": 0.5939,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.4272,
+   "2": 0.8776,
+   "4": 0.0,
+   "7": 0.0234,
+   "8": 0.2807,
+   "9": 0.4828
+  },
+  "answers": {
+   "Normal operation": 1627,
+   "Scaling in PCK": 1295,
+   "Hydrate in production line": 131,
+   "Hydrate in service line": 104,
+   "Spurious closure of DHSV": 43,
+   "Flow instability": 20
+  }
+ },
+ "time_shuffle": {
+  "macro_f1": 0.1086,
+  "event_recall": 0.8558,
+  "false_alarm_rate": 0.6443,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.4843,
+   "2": 0.0,
+   "4": 0.0,
+   "7": 0.0518,
+   "8": 0.1153,
+   "9": 0.0
+  },
+  "answers": {
+   "Scaling in PCK": 1962,
+   "Normal operation": 846,
+   "Hydrate in production line": 411,
+   "Hydrate in service line": 1
+  },
+  "same_answer_as_original": 0.6873,
+  "vs_original": {
+   "macro_f1_difference": -0.24,
+   "ci95": [
+    -0.2844,
+    -0.0867
+   ],
+   "share_of_resamples_a_better": 0.001,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  }
+ },
+ "noise_signal": {
+  "macro_f1": 0.1084,
+  "event_recall": 0.882,
+  "false_alarm_rate": 0.6532,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.4819,
+   "2": 0.0,
+   "4": 0.0,
+   "7": 0.0595,
+   "8": 0.109,
+   "9": 0.0
+  },
+  "answers": {
+   "Scaling in PCK": 1990,
+   "Normal operation": 793,
+   "Hydrate in production line": 437
+  },
+  "same_answer_as_original": 0.6736,
+  "vs_original": {
+   "macro_f1_difference": -0.2402,
+   "ci95": [
+    -0.286,
+    -0.0862
+   ],
+   "share_of_resamples_a_better": 0.001,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  }
+ },
+ "signal_from_other": {
+  "macro_f1": 0.1624,
+  "event_recall": 0.6177,
+  "false_alarm_rate": 0.59,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.4796,
+   "2": 0.0,
+   "4": 0.0,
+   "7": 0.0379,
+   "8": 0.2571,
+   "9": 0.2
+  },
+  "answers": {
+   "Scaling in PCK": 1689,
+   "Normal operation": 1281,
+   "Hydrate in production line": 170,
+   "Hydrate in service line": 59,
+   "Flow instability": 17,
+   "Spurious closure of DHSV": 4
+  },
+  "follows_original_label": 0.2522,
+  "follows_donor_label": 0.1789,
+  "same_answer_as_original": 0.8028,
+  "vs_original": {
+   "macro_f1_difference": -0.1862,
+   "ci95": [
+    -0.2263,
+    -0.0311
+   ],
+   "share_of_resamples_a_better": 0.003,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  }
+ },
+ "stats_from_other": {
+  "macro_f1": 0.1179,
+  "event_recall": 0.5661,
+  "false_alarm_rate": 0.6271,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.4353,
+   "2": 0.069,
+   "4": 0.0193,
+   "7": 0.0858,
+   "8": 0.0,
+   "9": 0.098
+  },
+  "answers": {
+   "Scaling in PCK": 1589,
+   "Normal operation": 1287,
+   "Hydrate in production line": 258,
+   "Hydrate in service line": 61,
+   "Flow instability": 22,
+   "Spurious closure of DHSV": 3
+  },
+  "follows_original_label": 0.2379,
+  "follows_donor_label": 0.1823,
+  "same_answer_as_original": 0.4298,
+  "vs_original": {
+   "macro_f1_difference": -0.2307,
+   "ci95": [
+    -0.2971,
+    -0.0804
+   ],
+   "share_of_resamples_a_better": 0.0005,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  }
+ },
+ "no_stats": {
+  "macro_f1": 0.2178,
+  "event_recall": 0.036,
+  "false_alarm_rate": 0.308,
+  "invalid_share": 0.0,
+  "per_class_f1": {
+   "0": 0.5654,
+   "2": 0.7273,
+   "4": 0.0,
+   "7": 0.0,
+   "8": 0.0144,
+   "9": 0.0
+  },
+  "answers": {
+   "Normal operation": 2613,
+   "Scaling in PCK": 475,
+   "Hydrate in production line": 99,
+   "Spurious closure of DHSV": 33
+  },
+  "same_answer_as_original": 0.6146,
+  "vs_original": {
+   "macro_f1_difference": -0.1307,
+   "ci95": [
+    -0.1861,
+    -0.0217
+   ],
+   "share_of_resamples_a_better": 0.003,
+   "note": "Resamples instances; windows of one well stay correlated, so read the interval as optimistic."
+  }
+ }
+}
