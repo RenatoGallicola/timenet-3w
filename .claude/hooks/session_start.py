@@ -7,7 +7,7 @@ docs/STATUS.md as they are on `origin/main`, whatever branch is checked out, and
 issues with their assignees. It uses only the standard library and always exits 0, so a failure
 never blocks a session.
 
-Usage: python session_start.py [path-to-timenet-3w]
+Usage: python session_start.py [path-to-wellread]
 Without an argument, the repo is the folder two levels above this script.
 """
 
@@ -83,7 +83,7 @@ def open_issues(repo: Path) -> str:
 def main() -> None:
     """Print the session context for Claude."""
     repo = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parents[2]
-    print(f"# timenet-3w session context ({repo})")
+    print(f"# wellread session context ({repo})")
     print(sync(repo))
     print()
     print(status_sections(repo))
