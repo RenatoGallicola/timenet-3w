@@ -1,5 +1,5 @@
 ---
-title: 3W on TimeNet
+title: WellRead
 emoji: 🛢️
 colorFrom: blue
 colorTo: gray
@@ -9,9 +9,9 @@ license: cc-by-4.0
 short_description: OpenTSLM reading oil-well sensors, tested on unseen wells
 ---
 
-# 3W on TimeNet
+# WellRead
 
-Static demo of the [timenet-3w](https://github.com/RenatoGallicola/timenet-3w) project (TimeNet
+Static demo of [WellRead](https://github.com/RenatoGallicola/timenet-3w) (TimeNet
 Hackathon, Round 1): Petrobras 3W onboarded into TimeNet
 ([PR #833](https://github.com/OpenTSLM/TimeNet/pull/833)), OpenTSLM fine-tuned to recognize abnormal
 oil-well events, evaluated on wells held out by well.
