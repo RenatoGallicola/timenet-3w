@@ -377,7 +377,7 @@ tags: [time-series, opentslm, timenet, petrobras-3w]
 
 OpenTSLM-SP (Llama 3.2 1B, LoRA) fine-tuned to classify 30-minute windows of offshore oil-well
 sensor data from Petrobras 3W v2.0.0 (CC BY 4.0), read through the TimeNet `petrobras/three-w`
-dataset. Code: https://github.com/RenatoGallicola/timenet-3w
+dataset. Code: https://github.com/RenatoGallicola/wellread
 
 - Starting checkpoint: `{cfg.get('base_checkpoint', BASE_CHECKPOINT)}`
 - OpenTSLM commit: `{cfg.get('opentslm_commit', OPENTSLM_COMMIT)}`

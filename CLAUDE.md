@@ -14,7 +14,7 @@ change anything already decided.
 
 ## Claim before you work (avoid overlaps)
 1. Every block of work that lives in the repo is a **GitHub issue** on
-   `RenatoGallicola/timenet-3w`. Posts and the submission form are not issues: they are tracked in
+   `RenatoGallicola/wellread`. Posts and the submission form are not issues: they are tracked in
    the "Final deliverables" section of `docs/STATUS.md`.
 2. **Before starting a block**, check the issues (`gh issue list`). If the block is assigned to the
    other member, stop and tell the user. If it is free, assign it to the current user
@@ -63,7 +63,7 @@ Full plan: `docs/PLAN.md`. Data format between the two parts: `docs/DATA_CONTRAC
 ## Repositories
 | Repo | Use |
 |---|---|
-| https://github.com/RenatoGallicola/timenet-3w | This repo: windows, TimeNet-to-OpenTSLM bridge, training, evaluation, demo, docs |
+| https://github.com/RenatoGallicola/wellread | This repo: windows, TimeNet-to-OpenTSLM bridge, training, evaluation, demo, docs |
 | https://github.com/RenatoGallicola/TimeNet | Fork of OpenTSLM/TimeNet: only the 3W connector, PR [#833](https://github.com/OpenTSLM/TimeNet/pull/833) |
 
 ## Constraints

@@ -10,7 +10,7 @@ The commands are for **Windows (PowerShell)**. They work the same on macOS and L
 ## 1. Accept the GitHub invitations
 Collaborators are invited to two repos. Accept both invitations (GitHub email, or
 https://github.com/notifications):
-- https://github.com/RenatoGallicola/timenet-3w — the project
+- https://github.com/RenatoGallicola/wellread — the project
 - https://github.com/RenatoGallicola/TimeNet — the TimeNet fork with the connector
 
 Without accepting them you cannot push.
@@ -35,7 +35,7 @@ Pick a work folder, for example `Desktop\TimeNet`, and always work inside it:
 ```powershell
 mkdir $HOME\Desktop\TimeNet
 cd $HOME\Desktop\TimeNet
-git clone https://github.com/RenatoGallicola/timenet-3w.git
+git clone https://github.com/RenatoGallicola/wellread.git
 ```
 The TimeNet fork is only needed by whoever works on the connector.
 
@@ -79,7 +79,7 @@ notepad .env
 which downloads 3W by itself.
 
 The whole team uses 3W v2.0.0 at commit `c86cc7c70063646910be7292de8a54a6fb2a8399`. Download it into
-a `data` folder next to the repo, outside `timenet-3w`. It is about 1.9 GB:
+a `data` folder next to the repo, outside `wellread`. It is about 1.9 GB:
 ```powershell
 cd $HOME\Desktop\TimeNet
 mkdir data
@@ -107,7 +107,7 @@ uv run python scripts/make_windows.py ..\registry ..\data\windows --splits split
 See `docs/DATA_CONTRACT.md` for the window format.
 
 ## 8. Start Claude Code
-Open the `timenet-3w` folder in VS Code and open Claude Code. The first time, Claude Code may ask
+Open the `wellread` folder in VS Code and open Claude Code. The first time, Claude Code may ask
 you to approve the project settings: they hold the `SessionStart` hook that pulls the repo and shows
 the status and the open issues. Approve them.
 
