@@ -8,7 +8,7 @@ Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | No update since Saturday afternoon; his open blocks taken over by ariannabalducci | None |
-| ariannabalducci (Model and demo) | Posts and Discord; demo update optional | None |
+| ariannabalducci (Model and demo) | #37 per-well normalization experiment; posts and Discord | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
