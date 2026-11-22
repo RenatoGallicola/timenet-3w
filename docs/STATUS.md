@@ -3,13 +3,12 @@
 Update it whenever a block starts or ends (see `CLAUDE.md`). Newest entries first.
 
 ## Now
-About 2 days left: submit by **Sunday 22 at 20:00** (hard deadline: Monday 23 at 08:59 Italian
-time).
+Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 08:59 Italian time).
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | Next: #3 scoring (OpenTSLM perturbed predictions are on `main`), then the demo update, #11 README, post 1 | None |
-| ariannabalducci (Model and demo) | Next (Sunday): #26 phase 3 decision, rationale examples for the demo (#10), results for #11 | None |
+| RenatoGallicola (Data and TimeNet) | No update since Saturday afternoon; his open blocks taken over by ariannabalducci | None |
+| ariannabalducci (Model and demo) | #3 scoring of the OpenTSLM perturbed predictions, #11 README, demo update, posts | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -25,6 +24,8 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-22 (ariannabalducci): **#26 closed** by the exit rule: phase 3 (ensemble, threshold) not ready by
+  Sunday morning, so the submission uses run 1; no second look at the test split. **#9 merged** (PR #33).
 - 2026-11-21 (ariannabalducci): **#9 done** (branch `issue/9-rationales`): `scripts/rationales.py` writes
   rationales from the shown sensors (trend, step, oscillation, never the class) and checks every claim a
   model writes. CV by well, balancing 1.0, 1 epoch, **with vs without rationales**: macro-F1 0.363 ± 0.086
