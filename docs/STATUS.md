@@ -18,9 +18,9 @@ Not repo work, so not issues. Tick each one when done.
 | Deliverable | Owner | When | Done |
 |---|---|---|---|
 | Post on X: one thread (dataset, results, demo, with screenshots) | RenatoGallicola; ariannabalducci quotes it | Sunday | ✅ https://x.com/RenatoGallicola/status/2124629456111505902 |
-| Post on LinkedIn (same content), ariannabalducci reshares with a comment | RenatoGallicola | Sunday | |
+| Post on LinkedIn | both | Sunday | ✅ RenatoGallicola: https://www.linkedin.com/feed/update/urn:li:activity:7530407680117690368/ ; ariannabalducci (collaborative post): https://www.linkedin.com/feed/update/urn:li:activity:7530407903305052161/ . Only one goes in the form: choose it together. |
 | Post on Discord | ariannabalducci | Sunday | |
-| Submission form (PR link, demo link, repo, post links) | RenatoGallicola | **Sunday by 20:00** | |
+| Submission form: PR https://github.com/OpenTSLM/TimeNet/pull/833 , demo https://huggingface.co/spaces/timenet-3w/3w-on-timenet , repo https://github.com/RenatoGallicola/wellread , X and LinkedIn links above | ariannabalducci | **by Monday 23 at 08:59 Italian time** | |
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
