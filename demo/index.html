@@ -145,7 +145,8 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--bor
     <h2>Does a model read the signal, or only its summary statistics?</h2>
     <p class="sub">OpenTSLM receives each series normalized, with its mean and standard deviation written in the prompt. A model could answer from those numbers alone. We test it by perturbing the inputs: shuffling the time order, replacing the series with noise of the same statistics, or swapping the series or the statistics with those of another event.</p>
     <div class="card scroll"><table id="perturb-table"></table></div>
-    <div class="callout">The same tests on OpenTSLM are running now and will be added here. The check above on the classical baselines shows the tool works: the shape model collapses when the time order is shuffled, while the statistics-only model does not notice.</div>
+    <p class="note">Macro-F1 under each perturbation. OpenTSLM is the run 1 model, unchanged; perturbing the test windows selects nothing, it only probes the fixed model. The baselines confirm the tool: the shape model collapses when the time order is shuffled, while the statistics-only model does not notice.</p>
+    <div class="callout" id="perturb-callout"></div>
   </section>
 
   <section id="limits">
@@ -155,7 +156,7 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--bor
         <li><b>Few wells per event.</b> In the test split, three event types come from a single well each, so per-class scores rest on one to three events.</li>
         <li><b>OpenTSLM and the baseline are statistically tied</b> on macro-F1, while OpenTSLM raises far more false alarms. OpenTSLM is better on the two hydrate events, where the baseline almost always fails, and misses flow instability entirely.</li>
         <li><b>Early warning</b> holds only for some event types in the lead-time analysis so far.</li>
-        <li><b>Explanations</b>: this model answers with the event type only; a version trained with checked explanations is in progress.</li>
+        <li><b>Explanations</b>: a version trained to explain its answer from the sensors, with every claim checked automatically, gave no robust gain in cross-validation by well, so the model shown here answers with the event type only.</li>
       </ul>
     </div>
   </section>
@@ -276,11 +277,15 @@ new Chart(document.getElementById("lead-chart"), {
 });
 
 // Perturbation table (XGBoost check)
-const PX = D.results.perturbation_xgboost_val;
+const PX = D.results.perturbation_xgboost_val, PO = D.results.perturbation_opentslm;
 const conds = { original: "Original windows", time_shuffle: "Time order shuffled", noise_signal: "Noise with the same statistics", signal_from_other: "Series from another event", stats_from_other: "Statistics from another event", no_stats: "No statistics in the prompt" };
 document.getElementById("perturb-table").innerHTML =
-  `<tr><th>Condition (validation wells)</th><th>Baseline on shape</th><th>Baseline on mean and std</th><th>OpenTSLM</th></tr>` +
-  Object.keys(conds).map(k => `<tr><td>${conds[k]}</td><td>${fmt(PX.shape[k].macro_f1)}</td><td>${fmt(PX.mean_std[k].macro_f1)}</td><td>running</td></tr>`).join("");
+  `<tr><th>Condition</th><th>OpenTSLM<br>validation</th><th>OpenTSLM<br>test</th><th>Shape baseline<br>validation</th><th>Mean/std baseline<br>validation</th></tr>` +
+  Object.keys(conds).map(k => `<tr${k === "original" ? ' class="hl"' : ""}><td>${conds[k]}</td><td>${fmt(PO.val[k].macro_f1)}</td><td>${fmt(PO.test[k].macro_f1)}</td><td>${fmt(PX.shape[k].macro_f1)}</td><td>${fmt(PX.mean_std[k].macro_f1)}</td></tr>`).join("");
+const sv = PO.val.stats_from_other, st = PO.test.stats_from_other;
+document.getElementById("perturb-callout").innerHTML =
+  `<b>OpenTSLM reads the signal, not only the numbers in its prompt.</b> Shuffling the time order or replacing the series with noise of the same statistics drops its macro-F1 from ${fmt(PO.val.original.macro_f1)} to ${fmt(PO.val.time_shuffle.macro_f1)} on validation and from ${fmt(PO.test.original.macro_f1)} to ${fmt(PO.test.time_shuffle.macro_f1)} on test; every drop has a paired interval below zero. ` +
+  `It also uses the statistics: when they come from another event, on validation it follows them in ${pct(sv.follows_donor_label)} of windows and its own series in ${pct(sv.follows_original_label)}; on test the conflict is inconclusive (${pct(st.follows_donor_label)} vs ${pct(st.follows_original_label)}).`;
 </script>
 </body>
 </html>

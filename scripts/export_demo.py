@@ -139,6 +139,15 @@ def main() -> None:
             "lead_time_val": lead_time["class_average"],
             "lead_time_false_alarm_rate": lead_time["false_alarm_rate_on_normal_windows"],
             "perturbation_xgboost_val": json.loads((RESULTS / "perturbation" / "xgboost_val.json").read_text(encoding="utf-8")),
+            "perturbation_opentslm": {
+                split: {
+                    cond: {k: v[k] for k in ("macro_f1", "follows_original_label", "follows_donor_label") if k in v}
+                    for cond, v in json.loads(
+                        (RESULTS / "perturbation" / f"opentslm_sp_run1_{split}.json").read_text(encoding="utf-8")
+                    ).items()
+                }
+                for split in ("val", "test")
+            },
         },
     }
     out = ROOT / "demo" / "data.js"
