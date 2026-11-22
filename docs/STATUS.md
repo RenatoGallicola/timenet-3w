@@ -8,7 +8,7 @@ Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | No update since Saturday afternoon; his open blocks taken over by ariannabalducci | None |
-| ariannabalducci (Model and demo) | #37 per-well normalization experiment; posts and Discord | None |
+| ariannabalducci (Model and demo) | Posts and Discord; demo update optional | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -24,6 +24,9 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-22 (ariannabalducci): **#37 negative** (PR #38): per-well normalization of the statistics hurts XGBoost
+  on the 3 folds by well (shape 0.317 -> 0.269; per-well mean/std 0.142 vs absolute 0.336), below the
+  pre-registered 0.347, so no OpenTSLM run. Absolute levels carry physics that transfers across wells.
 - 2026-11-22 (ariannabalducci): **#3 done** (PRs #35, #36): `perturb.py score`. OpenTSLM run 1 macro-F1 val / test:
   original 0.51 / 0.35, time shuffle 0.19 / 0.11, noise 0.21 / 0.11, no statistics 0.09 / 0.22, signal from
   another class 0.26 / 0.16, statistics from another class 0.11 / 0.12; every drop has a paired interval below
