@@ -24,6 +24,8 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-22 (RenatoGallicola): **#39 done** (PR #40): demo republished with the OpenTSLM perturbation
+  results of #3 (validation and test) and the #9 outcome in the limits.
 - 2026-11-22 (ariannabalducci): **#37 negative** (PR #38): per-well normalization of the statistics hurts XGBoost
   on the 3 folds by well (shape 0.317 -> 0.269; per-well mean/std 0.142 vs absolute 0.336), below the
   pre-registered 0.347, so no OpenTSLM run. Absolute levels carry physics that transfers across wells.
