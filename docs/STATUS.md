@@ -17,8 +17,8 @@ Not repo work, so not issues. Tick each one when done.
 
 | Deliverable | Owner | When | Done |
 |---|---|---|---|
-| Post 1 on X and LinkedIn ("bringing 3W to TimeNet", with the PR link) | RenatoGallicola | Friday evening or Saturday morning | |
-| Post 2 on X and LinkedIn (results and demo, with metric screenshots) | both | Sunday | |
+| Post on X: one thread (dataset, results, demo, with screenshots) | RenatoGallicola; ariannabalducci quotes it | Sunday | ✅ https://x.com/RenatoGallicola/status/2124629456111505902 |
+| Post on LinkedIn (same content), ariannabalducci reshares with a comment | RenatoGallicola | Sunday | |
 | Post on Discord | ariannabalducci | Sunday | |
 | Submission form (PR link, demo link, repo, post links) | RenatoGallicola | **Sunday by 20:00** | |
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
