@@ -1,5 +1,6 @@
 ---
 title: WellRead
+emoji: 🛢️
 colorFrom: blue
 colorTo: gray
 sdk: static
