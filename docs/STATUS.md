@@ -7,7 +7,7 @@ Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | **In progress:** #41 (demo restyle, README for the judges, project name), then posts and the submission form | None |
+| RenatoGallicola (Data and TimeNet) | Posts and the submission form | None |
 | ariannabalducci (Model and demo) | Posts and Discord; demo update optional | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
@@ -24,6 +24,10 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-22 (RenatoGallicola): **#41 done** (PR #42): project name **WellRead** (repo and Space URLs
+  unchanged). Demo restyled as a process-control console and republished; README rewritten for the
+  judges (screenshot, why it matters, what we built, key results, citation), with the detailed method
+  and results moved unchanged to `docs/RESULTS.md`. Repo description fixed (no early-warning claim).
 - 2026-11-22 (RenatoGallicola): **#39 done** (PR #40): demo republished with the OpenTSLM perturbation
   results of #3 (validation and test) and the #9 outcome in the limits.
 - 2026-11-22 (ariannabalducci): **#37 negative** (PR #38): per-well normalization of the statistics hurts XGBoost
