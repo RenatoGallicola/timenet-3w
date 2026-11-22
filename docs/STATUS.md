@@ -7,7 +7,7 @@ Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 
 
 | Who | Working on | Blockers |
 |---|---|---|
-| RenatoGallicola (Data and TimeNet) | No update since Saturday afternoon; his open blocks taken over by ariannabalducci | None |
+| RenatoGallicola (Data and TimeNet) | **In progress:** #41 (demo restyle, README for the judges, project name), then posts and the submission form | None |
 | ariannabalducci (Model and demo) | Posts and Discord; demo update optional | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
