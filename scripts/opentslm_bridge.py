@@ -133,7 +133,9 @@ class ThreeWQADataset:
     Works with `torch.utils.data.DataLoader` (no torch import needed here). With
     `sensor_dropout=True` every access draws a new random subset of sensors.
 
-    `rationales` maps `window_id` to a rationale text (issue #9); when given, the answer is
+    `rationales` (issue #9) is either a dict mapping `window_id` to a rationale text, or "auto": the
+    rationale is computed by `rationales.rationale` from the sensors shown in this access (after
+    sensor dropout), so it never cites a hidden sensor. When given, the answer is
     "<rationale> Answer: <state>" after a "Rationale" post prompt. Otherwise the post prompt is
     "Answer:" and the answer is the state name alone.
     """
@@ -145,7 +147,7 @@ class ThreeWQADataset:
         eos_token: str = "",
         sensor_dropout: bool = False,
         seed: int = 0,
-        rationales: dict[str, str] | None = None,
+        rationales: dict[str, str] | str | None = None,
     ):
         windows_dir = Path(windows_dir)
         data = np.load(windows_dir / f"{split}.npz")
@@ -173,9 +175,13 @@ class ThreeWQADataset:
     def __len__(self) -> int:
         return len(self.X)
 
-    def answer(self, i: int) -> str:
+    def answer(self, i: int, shown: np.ndarray | None = None) -> str:
         label = self.names[int(self.y[i])]
-        if self.rationales is not None:
+        if self.rationales == "auto":
+            from rationales import rationale
+
+            label = f"{rationale(self.X[i], self.mask[i] if shown is None else shown)} Answer: {label}"
+        elif self.rationales is not None:
             label = f"{self.rationales[self.rows.window_id.iat[i]].strip()} Answer: {label}"
         return label + self.eos_token
 
@@ -185,11 +191,13 @@ class ThreeWQADataset:
             mask = sensor_dropout(mask, self.rng)
         series, texts = [], []
         n_points = self.X.shape[-1]
+        shown = np.zeros_like(mask)
         for j in np.flatnonzero(mask):
             x = self.X[i, j]
             n_missing = int(np.isnan(x).sum())
             if n_missing == n_points:
                 continue
+            shown[j] = True
             series.append(encoder_series(x))
             texts.append(
                 sensor_text(
@@ -202,7 +210,7 @@ class ThreeWQADataset:
             "time_series": series,
             "time_series_text": texts,
             "post_prompt": POST_PROMPT_RATIONALE if self.rationales is not None else POST_PROMPT_LABEL,
-            "answer": self.answer(i),
+            "answer": self.answer(i, shown),
             "window_id": self.rows.window_id.iat[i],
             "label": int(self.y[i]),
         }
@@ -235,9 +243,11 @@ def main() -> None:
     parser.add_argument("--show", type=int, default=1, help="number of example prompts to print")
     parser.add_argument("--dropout", action="store_true", help="apply the training sensor dropout")
     parser.add_argument("--no-check", action="store_true", help="skip the check of every window")
+    parser.add_argument("--rationales", action="store_true", help="answers with computed rationales (#9)")
     args = parser.parse_args()
 
-    ds = ThreeWQADataset(args.windows_dir, args.split, sensor_dropout=args.dropout)
+    ds = ThreeWQADataset(args.windows_dir, args.split, sensor_dropout=args.dropout,
+                         rationales="auto" if args.rationales else None)
     for i in np.linspace(0, len(ds) - 1, args.show, dtype=int):
         s = ds[int(i)]
         print("=" * 80)
