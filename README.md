@@ -6,12 +6,12 @@ abnormal oil-well events into [TimeNet](https://github.com/OpenTSLM/TimeNet), fi
 it only on wells it never saw in training. Project for the
 [TimeNet Online Hackathon](https://challenge.timenet.ai/), Round 1 (November 2026).
 
-| | |
-|---|---|
-| **TimeNet PR** | [OpenTSLM/TimeNet#833](https://github.com/OpenTSLM/TimeNet/pull/833): Petrobras 3W as the `petrobras/three-w` dataset, in TimeNet's `industrial` domain |
-| **Demo** | [huggingface.co/spaces/timenet-3w/3w-on-timenet](https://huggingface.co/spaces/timenet-3w/3w-on-timenet): test windows with both models' answers, results, split leakage, signal test |
-| **Full results** | [`docs/RESULTS.md`](docs/RESULTS.md): every number, with the method behind it |
-| **Data** | [Petrobras 3W](https://github.com/petrobras/3W) v2.0.0, CC BY 4.0 |
+- **TimeNet PR:** [OpenTSLM/TimeNet#833](https://github.com/OpenTSLM/TimeNet/pull/833), Petrobras 3W
+  as the `petrobras/three-w` dataset in TimeNet's `industrial` domain
+- **Demo:** [huggingface.co/spaces/timenet-3w/3w-on-timenet](https://huggingface.co/spaces/timenet-3w/3w-on-timenet),
+  test windows with both models' answers, results, split leakage and the signal test
+- **Full results:** [`docs/RESULTS.md`](docs/RESULTS.md), every number with the method behind it
+- **Data:** [Petrobras 3W](https://github.com/petrobras/3W) v2.0.0, CC BY 4.0
 
 [![WellRead demo: sensor traces of an unseen well with the answers of OpenTSLM and XGBoost](docs/img/wellread_demo.png)](https://huggingface.co/spaces/timenet-3w/3w-on-timenet)
 
