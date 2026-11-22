@@ -42,8 +42,8 @@ deployed on a new well has never seen that well before. That is the setting we t
 ## Data in TimeNet
 
 The connector lives in our fork, branch `feature/petrobras-three-w`, under
-`datasets/petrobras/three_w/`. It is submitted upstream as PR #833 and has been reviewed by the
-maintainers. Everything here is built from that dataset, not from the raw Parquet files:
+`datasets/petrobras/three_w/`. It is submitted upstream as PR #833, where a maintainer has already
+updated it to the new connector API. Everything here is built from that dataset, not from the raw Parquet files:
 
 ```powershell
 uvx --from "git+https://github.com/RenatoGallicola/TimeNet@feature/petrobras-three-w#subdirectory=packages/timenet-connectors" timenet-build build petrobras/three-w --no-isolation --local-registry ..\registry
