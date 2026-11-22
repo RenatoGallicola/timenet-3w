@@ -8,7 +8,7 @@ Sunday evening: submit as soon as the README is in (hard deadline: Monday 23 at 
 | Who | Working on | Blockers |
 |---|---|---|
 | RenatoGallicola (Data and TimeNet) | No update since Saturday afternoon; his open blocks taken over by ariannabalducci | None |
-| ariannabalducci (Model and demo) | #3 scoring of the OpenTSLM perturbed predictions, #11 README, demo update, posts | None |
+| ariannabalducci (Model and demo) | Posts and Discord; demo update optional | None |
 
 The open blocks and who holds them are the GitHub issues: `gh issue list`.
 
@@ -24,6 +24,12 @@ Not repo work, so not issues. Tick each one when done.
 | Check whether the Nebius voucher arrived | ariannabalducci | as soon as possible | |
 
 ## Done
+- 2026-11-22 (ariannabalducci): **#3 done** (PRs #35, #36): `perturb.py score`. OpenTSLM run 1 macro-F1 val / test:
+  original 0.51 / 0.35, time shuffle 0.19 / 0.11, noise 0.21 / 0.11, no statistics 0.09 / 0.22, signal from
+  another class 0.26 / 0.16, statistics from another class 0.11 / 0.12; every drop has a paired interval below
+  zero. It reads the temporal shape; in conflicts it follows the statistics about 2:1 on validation, while on
+  test the conflict is inconclusive. **#11 done**: README rewritten for the judges and audited against
+  `results/`.
 - 2026-11-22 (ariannabalducci): **#26 closed** by the exit rule: phase 3 (ensemble, threshold) not ready by
   Sunday morning, so the submission uses run 1; no second look at the test split. **#9 merged** (PR #33).
 - 2026-11-21 (ariannabalducci): **#9 done** (branch `issue/9-rationales`): `scripts/rationales.py` writes
