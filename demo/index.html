@@ -2,290 +2,452 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3W on TimeNet: reading oil wells with a time-series language model</title>
-<meta name="description" content="Petrobras 3W onboarded into TimeNet, OpenTSLM fine-tuned to recognize abnormal oil-well events, evaluated on wells it has never seen.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WellRead</title>
+<meta name="description" content="Petrobras 3W onboarded into TimeNet, OpenTSLM fine-tuned to name abnormal oil-well events, tested only on wells it has never seen.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="data.js"></script>
 <style>
+/* Layout: a process-control console. Header bar, faceplate readouts, a trend display of stacked
+   strip charts, then result panels. Grey means normal; color marks only events, alarms and the
+   two models, as in a high-performance operator display. */
 :root {
-  --bg: #f7f8fa; --surface: #ffffff; --surface-2: #f0f2f5; --text: #14181f; --muted: #5b6472;
-  --border: #e2e6ec; --accent: #0f6cbd; --accent-soft: #e6f0fa; --good: #1a7f4b; --good-soft: #e5f4ec;
-  --bad: #c2410c; --bad-soft: #fdeee6; --warn-soft: #fff6dd; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.05);
-  --chart-grid: rgba(20,24,31,.08);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1117; --surface: #151b23; --surface-2: #1c2430; --text: #e6edf3; --muted: #9aa5b1;
-    --border: #2a3441; --accent: #4ea1f3; --accent-soft: #14273b; --good: #3fb97a; --good-soft: #10291d;
-    --bad: #f2845c; --bad-soft: #321a10; --warn-soft: #2d2410; --shadow: 0 1px 2px rgba(0,0,0,.4);
-    --chart-grid: rgba(230,237,243,.08);
-  }
+  color-scheme: dark;
+  --bg: #11161a; --panel: #171e23; --panel-2: #1d262c; --line: #2a353d; --grid: #222c33;
+  --fg: #e1e7ea; --muted: #93a1ab; --dim: #5f6d77;
+  --trace: #d3dbe0; --tslm: #6fc3d6; --base: #a3adb5; --alarm: #f0a73a; --bad: #ef6b5b; --ok: #8fce8b;
+  --f-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
-a { color: var(--accent); text-decoration: none; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+a { color: var(--tslm); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-header.hero { padding: 56px 0 36px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, var(--accent-soft), transparent); }
-.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-h1 { font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15; margin: 10px 0 14px; letter-spacing: -.02em; }
-.lede { font-size: 18px; color: var(--muted); max-width: 760px; margin: 0; }
-.links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 500; font-size: 14px; box-shadow: var(--shadow); }
-.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn:hover { text-decoration: none; filter: brightness(1.05); }
-section { padding: 44px 0 8px; }
-h2 { font-size: 24px; margin: 0 0 6px; letter-spacing: -.01em; }
-.sub { color: var(--muted); margin: 0 0 20px; max-width: 760px; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-top: 28px; }
-.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
-.stat b { display: block; font-size: 26px; letter-spacing: -.02em; }
-.stat span { color: var(--muted); font-size: 13px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font: 500 13px Inter, sans-serif; cursor: pointer; }
-.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-.explorer { display: grid; grid-template-columns: 260px 1fr; gap: 18px; }
-.explorer > *, .grid2 > * { min-width: 0; }
-.list { display: flex; flex-direction: column; gap: 8px; max-height: 620px; overflow: auto; padding-right: 4px; }
-.item { text-align: left; border: 1px solid var(--border); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; cursor: pointer; color: var(--text); font: 13px Inter, sans-serif; }
-.item[aria-selected="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); background: var(--surface); }
-.item .mono { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); }
-.answers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-.answer { border-radius: 12px; padding: 12px; border: 1px solid var(--border); background: var(--surface-2); }
-.answer small { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
-.answer b { font-size: 15px; }
-.answer.ok { background: var(--good-soft); border-color: transparent; }
-.answer.ok b::after { content: " ✓"; color: var(--good); }
-.answer.ko { background: var(--bad-soft); border-color: transparent; }
-.answer.ko b::after { content: " ✗"; color: var(--bad); }
-.meta { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
-.sensors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.sensor { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px 6px; background: var(--surface); }
-.sensor h4 { margin: 0; font-size: 13px; }
-.sensor p { margin: 0 0 4px; font-size: 12px; color: var(--muted); }
-.sensor canvas { width: 100% !important; height: 120px !important; }
+:focus-visible { outline: 2px solid var(--tslm); outline-offset: 2px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.tag { font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Header bar */
+.bar { border-bottom: 1px solid var(--line); background: var(--panel); }
+.bar .wrap { display: flex; align-items: center; gap: 18px; padding-block: 10px; flex-wrap: wrap; }
+.brand { font: 700 20px/1 var(--f-display); letter-spacing: .14em; text-transform: uppercase; }
+.brand small { font: 500 12px/1 var(--f-mono); letter-spacing: .06em; color: var(--muted); text-transform: none; margin-left: 10px; }
+.bar nav { margin-left: auto; display: flex; gap: 16px; flex-wrap: wrap; }
+.bar nav a { font: 500 12px/1 var(--f-mono); color: var(--muted); letter-spacing: .04em; }
+.bar nav a:hover { color: var(--fg); text-decoration: none; }
+
+/* Hero */
+.hero .wrap { padding-block: 48px 36px; display: grid; gap: 28px; }
+h1 { font: 600 clamp(38px, 6vw, 68px)/0.98 var(--f-display); letter-spacing: -.005em; margin: 0; max-width: 19ch; text-wrap: balance; text-transform: uppercase; }
+h1 em { font-style: normal; color: var(--alarm); }
+.lede { max-width: 66ch; color: var(--muted); font-size: 17px; margin: 0; }
+.lede b { color: var(--fg); font-weight: 500; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 500 13px/1 var(--f-mono); padding: 11px 14px; border: 1px solid var(--line); color: var(--fg); background: var(--panel); border-radius: 3px; }
+.btn:hover { border-color: var(--muted); text-decoration: none; }
+.btn.primary { border-color: var(--tslm); color: var(--tslm); }
+.faceplates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.fp { background: var(--panel); padding: 16px 18px 18px; display: grid; gap: 6px; align-content: start; }
+.fp .v { font: 500 34px/1 var(--f-mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.fp .v .arrow { color: var(--dim); font-size: 22px; padding: 0 4px; }
+.fp .v .bad { color: var(--bad); }
+.fp p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+/* Sections */
+section { padding-block: 40px 8px; }
+.head { display: grid; gap: 8px; margin-bottom: 18px; }
+h2 { font: 600 30px/1.05 var(--f-display); text-transform: uppercase; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+.head p { margin: 0; max-width: 72ch; color: var(--muted); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 3px; }
+
+/* Trend display */
+.console { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
+.console > * { min-width: 0; }
+.alarms { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px; border-bottom: 1px solid var(--line); }
+.filter { font: 500 11px/1 var(--f-mono); letter-spacing: .04em; padding: 7px 9px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 2px; cursor: pointer; }
+.filter[aria-pressed="true"] { color: var(--bg); background: var(--fg); border-color: var(--fg); }
+.rows { overflow: auto; max-height: 470px; }
+.row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--grid); background: transparent; color: var(--fg); cursor: pointer; font: 13px/1.35 var(--f-body); }
+.row:hover { background: var(--panel-2); }
+.row[aria-selected="true"] { background: var(--panel-2); box-shadow: inset 2px 0 0 var(--tslm); }
+.lamp { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
+.lamp.event { background: var(--alarm); box-shadow: 0 0 8px color-mix(in srgb, var(--alarm) 60%, transparent); }
+.row .sub { display: block; font: 11px/1.3 var(--f-mono); color: var(--muted); }
+.marks { display: flex; gap: 4px; font: 500 11px/1 var(--f-mono); }
+.mk { padding: 4px 5px; border-radius: 2px; border: 1px solid var(--line); color: var(--muted); }
+.mk.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+.mk.ko { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }
+.ro { padding: 14px 16px; display: grid; gap: 6px; border-right: 1px solid var(--line); min-width: 0; align-content: start; }
+.ro:last-child { border-right: 0; }
+.ro b { font: 600 20px/1.1 var(--f-display); text-transform: uppercase; letter-spacing: .02em; }
+.ro.truth b { color: var(--alarm); }
+.ro.truth.normal b { color: var(--fg); }
+.ro .verdict { font: 500 11px/1 var(--f-mono); letter-spacing: .06em; }
+.ro .verdict.ok { color: var(--ok); }
+.ro .verdict.ko { color: var(--bad); }
+.context { padding: 10px 16px; font: 12px/1.5 var(--f-mono); color: var(--muted); border-bottom: 1px solid var(--line); }
+.strips { display: grid; }
+.strip { display: grid; grid-template-columns: 170px minmax(0, 1fr); border-bottom: 1px solid var(--grid); }
+.strip:last-child { border-bottom: 0; }
+.strip .lbl { padding: 10px 12px 10px 16px; display: grid; gap: 3px; align-content: center; border-right: 1px solid var(--grid); min-width: 0; }
+.strip .lbl b { font: 500 13px/1 var(--f-mono); }
+.strip .lbl span { font-size: 11px; line-height: 1.3; color: var(--muted); }
+.strip .lbl .rng { font: 11px/1.3 var(--f-mono); color: var(--dim); }
+.strip canvas { width: 100%; height: 84px; display: block; }
+.axis { display: grid; grid-template-columns: 170px minmax(0, 1fr); border-top: 1px solid var(--line); }
+.axis div:last-child { display: flex; justify-content: space-between; padding: 6px 4px 8px; font: 11px/1 var(--f-mono); color: var(--dim); }
+.axis div:first-child { padding: 6px 12px 8px 16px; font: 11px/1 var(--f-mono); color: var(--dim); border-right: 1px solid var(--grid); }
+
+/* Results */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.grid2 > * { min-width: 0; }
+.pad { padding: 16px; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+th, td { padding: 10px 14px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 th:first-child, td:first-child { text-align: left; }
-th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
-tr.hl td { font-weight: 600; }
+th { font: 500 11px/1.3 var(--f-mono); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; vertical-align: bottom; }
+td.num { font-family: var(--f-mono); }
+td .bad { color: var(--bad); }
+tr:last-child td { border-bottom: 0; }
 .scroll { overflow-x: auto; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.chartbox { height: 300px; }
-.note { font-size: 13px; color: var(--muted); margin-top: 10px; }
-.callout { border-radius: 12px; padding: 14px 16px; background: var(--warn-soft); font-size: 14px; margin-top: 14px; }
-ul.limits { padding-left: 20px; margin: 0; }
-ul.limits li { margin-bottom: 8px; }
-footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
-@media (max-width: 820px) {
-  .explorer, .grid2 { grid-template-columns: 1fr; }
-  .list { flex-direction: row; overflow-x: auto; max-height: none; }
-  .item { min-width: 190px; }
-  .sensors { grid-template-columns: 1fr; }
-  .answers { grid-template-columns: 1fr; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 1px; margin-right: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font: 12px/1 var(--f-mono); color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 3px; margin-right: 7px; vertical-align: 3px; }
+.cls { display: grid; gap: 14px; }
+.cls-row { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 14px; align-items: center; }
+.cls-row .name { font-size: 14px; line-height: 1.3; }
+.cls-row .name small { display: block; font: 11px/1.4 var(--f-mono); color: var(--dim); }
+.bars { display: grid; gap: 4px; }
+.hbar { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; align-items: center; }
+.hbar .track { height: 10px; background: var(--grid); position: relative; }
+.hbar .fill { position: absolute; inset: 0 auto 0 0; }
+.hbar .val { font: 12px/1 var(--f-mono); color: var(--muted); text-align: right; }
+.note { font: 12px/1.6 var(--f-mono); color: var(--muted); margin: 12px 0 0; }
+.gauge { display: grid; gap: 18px; }
+.g-row { display: grid; gap: 6px; }
+.g-row .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.g-row .top span { font-size: 14px; }
+.g-row .top b { font: 500 22px/1 var(--f-mono); }
+.g-track { height: 18px; background: var(--grid); position: relative; }
+.g-fill { position: absolute; inset: 0 auto 0 0; }
+.g-err { position: absolute; top: -4px; bottom: -4px; border-left: 1px solid var(--fg); border-right: 1px solid var(--fg); }
+.g-err::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--fg); }
+.pill { display: inline-block; font: 500 11px/1 var(--f-mono); padding: 4px 6px; border-radius: 2px; border: 1px solid var(--line); color: var(--muted); }
+.pill.hit { color: var(--alarm); border-color: color-mix(in srgb, var(--alarm) 50%, transparent); }
+.cell { display: inline-grid; grid-template-columns: 56px 36px; gap: 8px; align-items: center; }
+.cell .track { height: 6px; background: var(--grid); position: relative; }
+.cell .fill { position: absolute; inset: 0 auto 0 0; }
+.finding { border-left: 2px solid var(--alarm); padding: 14px 16px; background: var(--panel); margin-top: 14px; max-width: 90ch; }
+.finding b { color: var(--fg); font-weight: 600; }
+.finding p { margin: 0; color: var(--muted); }
+.limits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.limits div { background: var(--panel); padding: 16px 18px; }
+.limits b { display: block; font: 600 17px/1.2 var(--f-display); text-transform: uppercase; letter-spacing: .02em; margin-bottom: 6px; }
+.limits p { margin: 0; color: var(--muted); font-size: 14px; }
+footer { margin-top: 48px; border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 22px 40px; font: 12px/1.7 var(--f-mono); color: var(--muted); }
+
+@media (max-width: 900px) {
+  .faceplates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .console, .grid2, .limits { grid-template-columns: minmax(0, 1fr); }
+  .alarms { border-right: 0; border-bottom: 1px solid var(--line); }
+  .rows { max-height: 260px; }
 }
+@media (max-width: 560px) {
+  .readout { grid-template-columns: minmax(0, 1fr); }
+  .ro { border-right: 0; border-bottom: 1px solid var(--grid); }
+  .strip, .axis { grid-template-columns: 96px minmax(0, 1fr); }
+  .strip .lbl span:not(.rng) { display: none; }
+  .cls-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .fp .v { font-size: 28px; }
+  .brand small { display: block; margin: 6px 0 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
+<div class="bar">
+  <div class="wrap">
+    <div class="brand">WellRead<small>Petrobras 3W on TimeNet</small></div>
+    <nav aria-label="Sections">
+      <a href="#trends">Trend display</a>
+      <a href="#results">Unseen wells</a>
+      <a href="#signal">Signal test</a>
+      <a href="#limits">Limits</a>
+    </nav>
+  </div>
+</div>
+
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow">TimeNet Hackathon · Round 1</div>
-    <h1>Reading oil wells with a time-series language model</h1>
-    <p class="lede">Abnormal events in offshore oil wells, such as hydrate blockages, flow instability or a spurious safety-valve closure, cost production and raise safety and spill risks. We onboarded Petrobras' <b>3W</b> dataset into <b>TimeNet</b> and fine-tuned <b>OpenTSLM</b> to recognize the event from a well's sensors, then evaluated it on wells it has never seen.</p>
-    <div class="links">
+    <div class="tag">TimeNet Hackathon · Round 1 · offshore oil wells</div>
+    <h1>Can a language model read a well it has <em>never seen?</em></h1>
+    <p class="lede">When an offshore well develops a fault, such as a safety valve closing by itself, hydrate blocking a line or unstable flow, production stops and safety and spill risks rise. We brought Petrobras' <b>3W</b> dataset into <b>TimeNet</b>, fine-tuned <b>OpenTSLM</b> to name the event from six well sensors, and scored it only on wells it never saw in training.</p>
+    <div class="actions">
       <a class="btn primary" href="https://github.com/OpenTSLM/TimeNet/pull/833" target="_blank" rel="noopener">3W in TimeNet · PR #833</a>
-      <a class="btn" href="https://github.com/RenatoGallicola/timenet-3w" target="_blank" rel="noopener">Code and results on GitHub</a>
-      <a class="btn" href="https://github.com/petrobras/3W" target="_blank" rel="noopener">Petrobras 3W dataset</a>
+      <a class="btn" href="https://github.com/RenatoGallicola/timenet-3w" target="_blank" rel="noopener">Code and results</a>
+      <a class="btn" href="https://github.com/petrobras/3W" target="_blank" rel="noopener">Petrobras 3W</a>
     </div>
-    <div class="stats" id="stats"></div>
+    <div class="faceplates" id="faceplates"></div>
   </div>
 </header>
 
-<main class="wrap">
-  <section id="explore">
-    <h2>Explore test windows</h2>
-    <p class="sub">Each window is 30 minutes of six sensors of a real well, resampled every 10 seconds. These wells were never seen in training. Pick an event type and a window to compare the true event with the answers of OpenTSLM and of the classical baseline. Right and wrong answers are both shown.</p>
-    <div class="card">
-      <div class="chips" id="chips" role="group" aria-label="Event type"></div>
-      <div class="explorer">
-        <div class="list" id="list" role="listbox" aria-label="Test windows"></div>
+<main>
+  <section id="trends">
+    <div class="wrap">
+      <div class="head">
+        <div class="tag">Trend display · test wells, never seen in training</div>
+        <h2>Thirty minutes of a real well</h2>
+        <p>Each window holds six sensors of one well, sampled every 10 seconds. Pick a window from the list to see the true event and what each model answered. The list mixes right and wrong answers on purpose.</p>
+      </div>
+      <div class="panel console">
+        <div class="alarms">
+          <div class="filters" id="filters" role="group" aria-label="Filter by event"></div>
+          <div class="rows" id="rows" role="listbox" aria-label="Test windows"></div>
+        </div>
         <div>
-          <div class="answers" id="answers"></div>
-          <div class="meta" id="meta"></div>
-          <div class="sensors" id="sensors"></div>
+          <div class="readout" id="readout"></div>
+          <div class="context" id="context"></div>
+          <div class="strips" id="strips"></div>
+          <div class="axis"><div>min</div><div id="axis"></div></div>
         </div>
       </div>
     </div>
   </section>
 
   <section id="results">
-    <h2>Results on wells never seen</h2>
-    <p class="sub">Test split of 8 wells held out by well, used once at the end. Macro-F1 averages the F1 of the 6 event types with the same weight. Event recall is the share of event windows flagged as any event; false alarms are the share of normal windows flagged as an event.</p>
-    <div class="card scroll"><table id="results-table"></table></div>
-    <div class="card scroll" style="margin-top:14px"><table id="perclass-table"></table></div>
-    <p class="note" id="paired-note"></p>
+    <div class="wrap">
+      <div class="head">
+        <div class="tag">Test split · 8 held-out wells · scored once</div>
+        <h2>On unseen wells, OpenTSLM ties a classical baseline</h2>
+        <p>Macro-F1 gives the six event types equal weight. Event recall is the share of event windows flagged as any event; false alarms are the share of normal windows flagged as an event.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel scroll"><table id="models"></table></div>
+        <div class="panel pad">
+          <div class="legend" style="margin-bottom:16px"><span><i style="background:var(--tslm)"></i>OpenTSLM</span><span><i style="background:var(--base)"></i>XGBoost baseline</span><span>F1 per event type</span></div>
+          <div class="cls" id="perclass"></div>
+        </div>
+      </div>
+      <p class="note" id="paired"></p>
+    </div>
   </section>
 
-  <section id="rigor">
-    <h2>Why the evaluation is split by well</h2>
-    <p class="sub">The same model on the same windows, cross-validated three ways. Splitting windows at random lets overlapping windows of one recording land on both sides; keeping recordings together still leaks the well. Only a split by well measures how a model does on a new well, so all our numbers use it.</p>
-    <div class="grid2">
-      <div class="card"><div class="chartbox"><canvas id="leak-chart"></canvas></div><p class="note">XGBoost baseline, 5-fold cross-validation on the training and validation wells. Error bars: standard deviation over the folds.</p></div>
-      <div class="card"><div class="chartbox"><canvas id="lead-chart"></canvas></div><p class="note">How early is an event flagged? Windows slid across the event onset (validation wells, XGBoost baseline, averaged over event types). Dashed line: false alarms on normal windows.</p></div>
+  <section id="split">
+    <div class="wrap">
+      <div class="head">
+        <div class="tag">Why we split by well</div>
+        <h2>A random split makes the same model look 2.6× better</h2>
+        <p>Windows of one recording overlap, and windows of one well share its sensors and operating point. Split at random, a model meets the test well in training. Only a split by well tells you how it does on a new well, so every number on this page uses one.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel pad">
+          <div class="gauge" id="gauge"></div>
+          <p class="note">XGBoost baseline, 5-fold cross-validation on the training and validation wells. Whiskers: one standard deviation over the folds.</p>
+        </div>
+        <div class="panel pad">
+          <div class="legend" style="margin-bottom:10px"><span><i style="background:var(--trace)"></i>flagged as an event</span><span><i style="background:var(--alarm)"></i>right event type</span><span><i style="background:var(--dim)"></i>false alarms on normal windows</span></div>
+          <div id="lead"></div>
+          <p class="note">How early is an event flagged? Windows slid across the event onset; the x axis is minutes from onset to window end (validation wells, XGBoost baseline, averaged over event types). A clear early signal appears only for the spurious DHSV closure, so we make no early-warning claim.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <section id="signal">
-    <h2>Does a model read the signal, or only its summary statistics?</h2>
-    <p class="sub">OpenTSLM receives each series normalized, with its mean and standard deviation written in the prompt. A model could answer from those numbers alone. We test it by perturbing the inputs: shuffling the time order, replacing the series with noise of the same statistics, or swapping the series or the statistics with those of another event.</p>
-    <div class="card scroll"><table id="perturb-table"></table></div>
-    <p class="note">Macro-F1 under each perturbation. OpenTSLM is the run 1 model, unchanged; perturbing the test windows selects nothing, it only probes the fixed model. The baselines confirm the tool: the shape model collapses when the time order is shuffled, while the statistics-only model does not notice.</p>
-    <div class="callout" id="perturb-callout"></div>
+    <div class="wrap">
+      <div class="head">
+        <div class="tag">Signal test · 6 perturbations of every window</div>
+        <h2>Does the model read the signal, or the numbers in its prompt?</h2>
+        <p>OpenTSLM gets each series twice: the normalized curve goes to its time-series encoder, and the mean and standard deviation are written into the text prompt. Each test breaks one of the two channels and leaves the other intact.</p>
+      </div>
+      <div class="panel scroll"><table id="perturb"></table></div>
+      <div class="finding" id="finding"></div>
+    </div>
   </section>
 
   <section id="limits">
-    <h2>What these results can and cannot show</h2>
-    <div class="card">
-      <ul class="limits">
-        <li><b>Few wells per event.</b> In the test split, three event types come from a single well each, so per-class scores rest on one to three events.</li>
-        <li><b>OpenTSLM and the baseline are statistically tied</b> on macro-F1, while OpenTSLM raises far more false alarms. OpenTSLM is better on the two hydrate events, where the baseline almost always fails, and misses flow instability entirely.</li>
-        <li><b>Early warning</b> holds only for some event types in the lead-time analysis so far.</li>
-        <li><b>Explanations</b>: a version trained to explain its answer from the sensors, with every claim checked automatically, gave no robust gain in cross-validation by well, so the model shown here answers with the event type only.</li>
-      </ul>
+    <div class="wrap">
+      <div class="head">
+        <div class="tag">Read before quoting a number</div>
+        <h2>Known limits</h2>
+      </div>
+      <div class="limits">
+        <div><b>Few wells per event</b><p>In the test split, three event types come from a single well each, so a per-class score rests on 2 to 8 recordings of one well.</p></div>
+        <div><b>A tie, not a win</b><p>OpenTSLM and the baseline are statistically tied on macro-F1. OpenTSLM raises far more false alarms; it does better on the two hydrate events and misses flow instability.</p></div>
+        <div><b>Validation did not transfer</b><p>OpenTSLM scored 0.51 on the validation wells and 0.35 on test. Validation flow instability came from a single well.</p></div>
+        <div><b>Explanations</b><p>A version trained to describe what the sensors did, with every claim checked against the data, gave no robust gain, so the model shown here answers with the event type only.</p></div>
+      </div>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    Data: <a href="https://github.com/petrobras/3W" target="_blank" rel="noopener">3W v2.0.0</a> by Petrobras, CC BY 4.0 (Vaz Vargas et al., Sci Data 13, 949, 2026). Format: <a href="https://github.com/OpenTSLM/TimeNet" target="_blank" rel="noopener">TimeNet</a>. Model: <a href="https://github.com/OpenTSLM/OpenTSLM" target="_blank" rel="noopener">OpenTSLM</a>. Predictions on this page were computed in advance; the model does not run in the browser.
+    Data: <a href="https://github.com/petrobras/3W" target="_blank" rel="noopener">3W v2.0.0</a> by Petrobras, CC BY 4.0 (Vaz Vargas et al., Sci Data 13, 949, 2026) · Format: <a href="https://github.com/OpenTSLM/TimeNet" target="_blank" rel="noopener">TimeNet</a> · Model: <a href="https://github.com/OpenTSLM/OpenTSLM" target="_blank" rel="noopener">OpenTSLM</a> on Llama 3.2 1B.<br>
+    Every answer on this page was computed in advance by the scripts in the repository; nothing runs in your browser.
   </div>
 </footer>
 
 <script>
-const D = window.DEMO_DATA;
-const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-const NAMES = D.classes;
-const fmt = (v, d = 2) => (v === null || v === undefined) ? "–" : Number(v).toFixed(d);
-const pct = (v) => (v === null || v === undefined) ? "–" : Math.round(v * 100) + "%";
-const T = D.results.test, O = T.opentslm_run1, X = T.xgboost_shape;
-const charts = [];
+(function () {
+  const D = window.DEMO_DATA;
+  const R = D.results, T = R.test, O = T.opentslm_run1, X = T.xgboost_shape;
+  const NAMES = D.classes;
+  const SHORT = { 0: "Normal", 2: "DHSV closure", 4: "Flow instability", 7: "PCK scaling", 8: "Hydrate, production", 9: "Hydrate, service" };
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const f2 = (v) => (v === null || v === undefined) ? "–" : Number(v).toFixed(2);
+  const pct = (v) => (v === null || v === undefined) ? "–" : Math.round(v * 100) + "%";
+  const $ = (id) => document.getElementById(id);
 
-Chart.defaults.font.family = "Inter, system-ui, sans-serif";
-Chart.defaults.color = css("--muted");
-Chart.defaults.borderColor = css("--chart-grid");
+  // Faceplates
+  const L = R.split_leakage;
+  $("faceplates").innerHTML = [
+    [`2,228`, `3W recordings onboarded to TimeNet: 1,119 real from 40 wells, plus simulated and hand-drawn.`],
+    [`${f2(L["random"].macro_f1_mean)}<span class="arrow">→</span>${f2(L["by well"].macro_f1_mean)}`, `Same model, random split against split by well. The gap is leakage.`],
+    [`${f2(O.macro_f1)}`, `OpenTSLM macro-F1 on unseen wells, against ${f2(X.macro_f1)} for XGBoost.`],
+    [`<span class="bad">${pct(O.false_alarm_rate)}</span>`, `OpenTSLM false alarms on normal windows of unseen wells (XGBoost ${pct(X.false_alarm_rate)}).`],
+  ].map(([v, p]) => `<div class="fp"><div class="v">${v}</div><p>${p}</p></div>`).join("");
 
-// Hero stats
-document.getElementById("stats").innerHTML = [
-  ["2,228", "3W instances in TimeNet"],
-  ["40", "real offshore wells"],
-  [fmt(O.macro_f1), "OpenTSLM macro-F1, unseen wells"],
-  [fmt(X.macro_f1), "classical baseline macro-F1"],
-].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+  // Trend display
+  let filter = "all", current = null;
+  const codes = Object.keys(NAMES).map(Number);
+  function renderFilters() {
+    const opts = [["all", "All"]].concat(codes.map(c => [String(c), SHORT[c]]));
+    $("filters").innerHTML = opts.map(([k, t]) => `<button class="filter" aria-pressed="${filter === k}" data-k="${k}">${t}</button>`).join("");
+    $("filters").querySelectorAll("button").forEach(b => b.onclick = () => { filter = b.dataset.k; renderFilters(); renderRows(true); });
+  }
+  const mark = (who, cls, truth) => `<span class="mk ${cls === truth ? "ok" : "ko"}" title="${who}: ${cls === null ? "no valid answer" : NAMES[cls]}">${who[0]} ${cls === truth ? "✓" : "✗"}</span>`;
+  function renderRows(selectFirst) {
+    const list = D.examples.map((e, i) => [e, i]).filter(([e]) => filter === "all" || String(e.label) === filter);
+    $("rows").innerHTML = list.map(([e, i]) => `<button class="row" role="option" data-i="${i}" aria-selected="${i === current}">
+      <span class="lamp ${e.label === 0 ? "" : "event"}"></span>
+      <span><span>${SHORT[e.label]}</span><span class="sub">${e.well} · minute ${e.start_min}</span></span>
+      <span class="marks">${mark("OpenTSLM", e.opentslm, e.label)}${mark("XGBoost", e.xgboost, e.label)}</span></button>`).join("");
+    $("rows").querySelectorAll(".row").forEach(b => b.onclick = () => select(Number(b.dataset.i)));
+    if (selectFirst && list.length) select(list[0][1]);
+  }
+  function select(i) {
+    current = i;
+    $("rows").querySelectorAll(".row").forEach(b => b.setAttribute("aria-selected", String(Number(b.dataset.i) === i)));
+    renderExample(D.examples[i]);
+  }
+  function verdict(who, cls, truth) {
+    const ok = cls === truth;
+    return `<div class="ro"><span class="tag">${who}</span><b>${cls === null || cls === undefined ? "No valid answer" : NAMES[cls]}</b><span class="verdict ${ok ? "ok" : "ko"}">${ok ? "✓ CORRECT" : "✗ WRONG"}</span></div>`;
+  }
+  function renderExample(e) {
+    $("readout").innerHTML =
+      `<div class="ro truth ${e.label === 0 ? "normal" : ""}"><span class="tag">True event</span><b>${NAMES[e.label]}</b><span class="tag">${e.label === 0 ? "no event" : "event"}</span></div>` +
+      verdict("OpenTSLM", e.opentslm, e.label) + verdict("XGBoost baseline", e.xgboost, e.label);
+    const phase = { transient: "event developing (transient)", steady: "event established (steady state)", normal: "normal operation" }[e.phase] || e.phase;
+    $("context").textContent = `${e.well} · recording ${e.instance} · window from minute ${e.start_min} · ${phase} · ${e.series.length} of 6 sensors recorded`;
+    $("strips").innerHTML = e.series.map((s, k) => {
+      const vals = s.values.filter(v => v !== null);
+      const lo = Math.min(...vals), hi = Math.max(...vals);
+      return `<div class="strip"><div class="lbl"><b>${s.name}</b><span>${s.description}</span><span class="rng">${lo.toFixed(1)}–${hi.toFixed(1)} ${s.unit}</span></div><canvas id="c${k}" aria-label="${s.name} over 30 minutes"></canvas></div>`;
+    }).join("");
+    const ticks = []; for (let m = 0; m <= D.window.minutes; m += 5) ticks.push(`<span>${m}</span>`);
+    $("axis").innerHTML = ticks.join("");
+    drawAll();
+  }
+  function drawStrip(canvas, values) {
+    const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+    const n = values.length, pt = 10, pb = 10;
+    const vals = values.filter(v => v !== null);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (hi - lo < 1e-9) { lo -= 1; hi += 1; }
+    const X = (i) => 4 + (w - 8) * i / (n - 1), Y = (v) => pt + (h - pt - pb) * (1 - (v - lo) / (hi - lo));
+    ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+    for (let m = 0; m <= D.window.minutes; m += 5) { const x = Math.round(4 + (w - 8) * m / D.window.minutes) + .5; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    [0, .5, 1].forEach(t => { const y = Math.round(pt + (h - pt - pb) * t) + .5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); });
+    const segs = []; let seg = [];
+    values.forEach((v, i) => { if (v === null) { if (seg.length) segs.push(seg); seg = []; } else seg.push([X(i), Y(v)]); });
+    if (seg.length) segs.push(seg);
+    const grad = ctx.createLinearGradient(0, pt, 0, h);
+    grad.addColorStop(0, "rgba(211,219,224,0.16)"); grad.addColorStop(1, "rgba(211,219,224,0)");
+    segs.forEach(s => {
+      ctx.beginPath(); ctx.moveTo(s[0][0], h); s.forEach(([x, y]) => ctx.lineTo(x, y)); ctx.lineTo(s[s.length - 1][0], h); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+      ctx.beginPath(); s.forEach(([x, y], j) => j ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.strokeStyle = css("--trace"); ctx.lineWidth = 1.6; ctx.lineJoin = "round"; ctx.stroke();
+    });
+    const last = segs.length ? segs[segs.length - 1] : null;
+    if (last) { const [x, y] = last[last.length - 1]; ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fillStyle = css("--fg"); ctx.fill(); }
+  }
+  function drawAll() { if (current === null) return; D.examples[current].series.forEach((s, k) => { const c = $("c" + k); if (c) drawStrip(c, s.values); }); }
+  if (window.ResizeObserver) new ResizeObserver(() => drawAll()).observe($("strips"));
+  current = Math.max(0, D.examples.findIndex(e => e.label === 2));
+  renderFilters(); renderRows(false); renderExample(D.examples[current]);
 
-// Explorer
-const classes = Object.keys(NAMES).map(Number);
-let current = classes.find(c => c !== 0) ?? classes[0];
-const chips = document.getElementById("chips");
-function renderChips() {
-  chips.innerHTML = classes.map(c => `<button class="chip" aria-pressed="${c === current}" data-c="${c}">${NAMES[c]}</button>`).join("");
-  chips.querySelectorAll(".chip").forEach(b => b.onclick = () => { current = Number(b.dataset.c); renderChips(); renderList(); });
-}
-function answerBox(title, cls, truth) {
-  if (cls === null || cls === undefined) return `<div class="answer ko"><small>${title}</small><b>no valid answer</b></div>`;
-  return `<div class="answer ${cls === truth ? "ok" : "ko"}"><small>${title}</small><b>${NAMES[cls]}</b></div>`;
-}
-function renderList() {
-  const items = D.examples.filter(e => e.label === current);
-  const list = document.getElementById("list");
-  list.innerHTML = items.map((e, i) => `<button class="item" role="option" aria-selected="${i === 0}" data-i="${D.examples.indexOf(e)}">
-      <div><b>${e.well}</b> · minute ${e.start_min}</div>
-      <div class="mono">OpenTSLM ${e.opentslm === e.label ? "✓" : "✗"} · baseline ${e.xgboost === e.label ? "✓" : "✗"}</div></button>`).join("");
-  list.querySelectorAll(".item").forEach(b => b.onclick = () => {
-    list.querySelectorAll(".item").forEach(x => x.setAttribute("aria-selected", "false"));
-    b.setAttribute("aria-selected", "true");
-    renderExample(D.examples[Number(b.dataset.i)]);
-  });
-  if (items.length) renderExample(items[0]);
-}
-function renderExample(e) {
-  document.getElementById("answers").innerHTML =
-    `<div class="answer"><small>True event</small><b>${NAMES[e.label]}</b></div>` +
-    answerBox("OpenTSLM", e.opentslm, e.label) + answerBox("Classical baseline", e.xgboost, e.label);
-  const phase = e.phase === "transient" ? "transient (developing) phase" : e.phase === "steady" ? "steady phase" : "normal operation";
-  document.getElementById("meta").textContent = `Recording ${e.instance}, window starting at minute ${e.start_min}, ${phase}. ${e.series.length} of 6 sensors recorded.`;
-  charts.splice(0).forEach(c => c.destroy());
-  const box = document.getElementById("sensors");
-  box.innerHTML = e.series.map((s, i) => `<div class="sensor"><h4>${s.name} <span style="color:var(--muted);font-weight:400">(${s.unit})</span></h4><p>${s.description}</p><canvas id="s${i}"></canvas></div>`).join("");
-  const labels = e.series[0].values.map((_, k) => (k * D.window.step_s / 60).toFixed(1));
-  e.series.forEach((s, i) => {
-    charts.push(new Chart(document.getElementById("s" + i), {
-      type: "line",
-      data: { labels, datasets: [{ data: s.values, borderColor: css("--accent"), borderWidth: 1.6, pointRadius: 0, spanGaps: false, tension: .2 }] },
-      options: { animation: false, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { title: (it) => `minute ${it[0].label}` } } },
-        scales: { x: { ticks: { maxTicksLimit: 7 }, title: { display: false } }, y: { ticks: { maxTicksLimit: 4 } } } }
-    }));
-  });
-}
-renderChips(); renderList();
+  // Models table
+  const bad = (v, t) => v > t ? `<span class="bad">${pct(v)}</span>` : pct(v);
+  $("models").innerHTML =
+    `<tr><th>Model</th><th>Macro-F1</th><th>Event recall</th><th>False alarms</th></tr>` +
+    `<tr><td><span class="swatch" style="background:var(--tslm)"></span>OpenTSLM, Llama 3.2 1B</td><td class="num">${f2(O.macro_f1)}</td><td class="num">${pct(O.event_recall)}</td><td class="num">${bad(O.false_alarm_rate, .3)}</td></tr>` +
+    `<tr><td><span class="swatch" style="background:var(--base)"></span>XGBoost, shape features</td><td class="num">${f2(X.macro_f1)}</td><td class="num">${pct(X.event_recall)}</td><td class="num">${bad(X.false_alarm_rate, .3)}</td></tr>` +
+    `<tr><td><span class="swatch" style="background:var(--dim)"></span>XGBoost, mean and std only</td><td class="num">${f2(T.xgboost_mean_std_macro_f1)}</td><td class="num">–</td><td class="num">–</td></tr>`;
+  const hbar = (v, color) => `<div class="hbar"><div class="track"><div class="fill" style="width:${Math.max(0, v) * 100}%;background:${color}"></div></div><span class="val">${f2(v)}</span></div>`;
+  $("perclass").innerHTML = Object.keys(O.per_class).map(c => {
+    const p = O.per_class[c];
+    return `<div class="cls-row"><div class="name">${NAMES[c]}<small>${p.wells} test well${p.wells > 1 ? "s" : ""} · ${p.instances} recordings</small></div>
+      <div class="bars">${hbar(p.f1, "var(--tslm)")}${hbar(X.per_class[c].f1, "var(--base)")}</div></div>`;
+  }).join("");
+  const P = T.paired;
+  $("paired").textContent = `Paired comparison on the same windows: OpenTSLM − XGBoost = ${f2(P.macro_f1_difference)} macro-F1, 95% bootstrap interval ${f2(P.ci95[0])} to ${f2(P.ci95[1])}. The interval includes zero, so the two are tied.`;
 
-// Results tables
-document.getElementById("results-table").innerHTML =
-  `<tr><th>Model</th><th>Macro-F1</th><th>Balanced accuracy</th><th>Event recall</th><th>False alarms</th></tr>` +
-  `<tr class="hl"><td>OpenTSLM (Llama 3.2 1B, SoftPrompt), run 1</td><td>${fmt(O.macro_f1)}</td><td>${fmt(O.balanced_accuracy)}</td><td>${pct(O.event_recall)}</td><td>${pct(O.false_alarm_rate)}</td></tr>` +
-  `<tr><td>XGBoost on shape features</td><td>${fmt(X.macro_f1)}</td><td>${fmt(X.balanced_accuracy)}</td><td>${pct(X.event_recall)}</td><td>${pct(X.false_alarm_rate)}</td></tr>` +
-  `<tr><td>XGBoost on mean and std only</td><td>${fmt(T.xgboost_mean_std_macro_f1)}</td><td>–</td><td>–</td><td>–</td></tr>`;
-document.getElementById("perclass-table").innerHTML =
-  `<tr><th>Event type (test wells)</th><th>OpenTSLM F1</th><th>Baseline F1</th></tr>` +
-  Object.keys(O.per_class).map(c => `<tr><td>${NAMES[c]} <span style="color:var(--muted)">(${O.per_class[c].wells} well${O.per_class[c].wells > 1 ? "s" : ""})</span></td><td>${fmt(O.per_class[c].f1)}</td><td>${fmt(X.per_class[c].f1)}</td></tr>`).join("");
-const P = T.paired;
-document.getElementById("paired-note").textContent =
-  `Paired comparison on the same windows: macro-F1 difference OpenTSLM − baseline = ${fmt(P.macro_f1_difference)} (95% bootstrap interval over recordings ${fmt(P.ci95[0])} to ${fmt(P.ci95[1])}), so the two are statistically tied.`;
+  // Split leakage gauge
+  const gl = { "random": ["Random windows", "var(--bad)"], "by instance": ["Split by recording", "var(--alarm)"], "by well": ["Split by well", "var(--trace)"] };
+  $("gauge").innerHTML = Object.keys(gl).map(k => {
+    const m = L[k].macro_f1_mean, s = L[k].macro_f1_std;
+    return `<div class="g-row"><div class="top"><span>${gl[k][0]}</span><b>${f2(m)}</b></div>
+      <div class="g-track"><div class="g-fill" style="width:${m * 100}%;background:${gl[k][1]}"></div><div class="g-err" style="left:${(m - s) * 100}%;width:${2 * s * 100}%"></div></div></div>`;
+  }).join("") + `<div class="legend" style="justify-content:space-between"><span>0</span><span>macro-F1</span><span>1</span></div>`;
 
-// Split leakage chart
-const L = D.results.split_leakage, lk = Object.keys(L);
-new Chart(document.getElementById("leak-chart"), {
-  type: "bar",
-  data: { labels: lk.map(k => "split " + k), datasets: [{ data: lk.map(k => L[k].macro_f1_mean), backgroundColor: ["#c44e52", "#dd8452", css("--accent")], borderRadius: 8 }] },
-  options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (it) => `macro-F1 ${fmt(L[lk[it.dataIndex]].macro_f1_mean)} ± ${fmt(L[lk[it.dataIndex]].macro_f1_std)}` } } },
-    scales: { y: { min: 0, max: 1, title: { display: true, text: "macro-F1" } } } },
-  plugins: [{ id: "errbars", afterDatasetsDraw(chart) {
-    const { ctx, scales: { y } } = chart; ctx.save(); ctx.strokeStyle = css("--text"); ctx.lineWidth = 1.5;
-    chart.getDatasetMeta(0).data.forEach((bar, i) => { const m = L[lk[i]].macro_f1_mean, s = L[lk[i]].macro_f1_std;
-      const top = y.getPixelForValue(m + s), bot = y.getPixelForValue(m - s); ctx.beginPath(); ctx.moveTo(bar.x, top); ctx.lineTo(bar.x, bot);
-      ctx.moveTo(bar.x - 6, top); ctx.lineTo(bar.x + 6, top); ctx.moveTo(bar.x - 6, bot); ctx.lineTo(bar.x + 6, bot); ctx.stroke();
-      ctx.fillStyle = css("--text"); ctx.font = "600 12px Inter"; ctx.textAlign = "center"; ctx.fillText(fmt(m), bar.x, top - 8); });
-    ctx.restore(); } }]
-});
+  // Lead-time chart (SVG)
+  const LT = R.lead_time_val, FA = R.lead_time_false_alarm_rate;
+  const W = 560, H = 250, ml = 34, mr = 10, mt = 16, mb = 30;
+  const xmin = LT[0].offset_min, xmax = LT[LT.length - 1].offset_min;
+  const sx = (v) => ml + (W - ml - mr) * (v - xmin) / (xmax - xmin), sy = (v) => mt + (H - mt - mb) * (1 - v);
+  const txt = (x, y, s, fill, anchor) => `<text x="${x}" y="${y}" text-anchor="${anchor || "middle"}" font-family="IBM Plex Mono, monospace" font-size="10" fill="${fill}">${s}</text>`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Share of event recordings flagged against minutes from event onset" style="display:block">`;
+  [0, .25, .5, .75, 1].forEach(t => { svg += `<line x1="${ml}" x2="${W - mr}" y1="${sy(t)}" y2="${sy(t)}" stroke="${css("--grid")}"/>` + txt(ml - 6, sy(t) + 4, t.toFixed(2), css("--dim"), "end"); });
+  for (let m = Math.ceil(xmin / 15) * 15; m <= xmax; m += 15) svg += txt(sx(m), H - 10, (m > 0 ? "+" : "") + m, css("--dim"));
+  svg += `<line x1="${sx(0)}" x2="${sx(0)}" y1="${mt - 6}" y2="${H - mb}" stroke="${css("--alarm")}" stroke-dasharray="3 3"/>` + txt(sx(0) + 5, mt + 2, "EVENT ONSET", css("--alarm"), "start");
+  svg += `<line x1="${ml}" x2="${W - mr}" y1="${sy(FA)}" y2="${sy(FA)}" stroke="${css("--dim")}" stroke-dasharray="6 4"/>`;
+  const path = (key) => LT.map((r, i) => `${i ? "L" : "M"}${sx(r.offset_min).toFixed(1)},${sy(r[key]).toFixed(1)}`).join("");
+  svg += `<path d="${path("detected")}" fill="none" stroke="${css("--trace")}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  svg += `<path d="${path("right_class")}" fill="none" stroke="${css("--alarm")}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  svg += `</svg>`;
+  $("lead").innerHTML = svg;
 
-// Lead-time chart
-const LT = D.results.lead_time_val, FA = D.results.lead_time_false_alarm_rate;
-new Chart(document.getElementById("lead-chart"), {
-  type: "line",
-  data: { labels: LT.map(r => (r.offset_min > 0 ? "+" : "") + r.offset_min), datasets: [
-    { label: "flagged as an event", data: LT.map(r => r.detected), borderColor: css("--accent"), backgroundColor: css("--accent"), pointRadius: 2, tension: .25 },
-    { label: "right event type", data: LT.map(r => r.right_class), borderColor: css("--good"), backgroundColor: css("--good"), pointRadius: 2, tension: .25 },
-    { label: "false alarms (normal windows)", data: LT.map(() => FA), borderColor: css("--muted"), borderDash: [6, 5], pointRadius: 0 } ] },
-  options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } },
-    scales: { x: { title: { display: true, text: "minutes from event onset to window end" }, ticks: { maxTicksLimit: 8 } }, y: { min: 0, max: 1, title: { display: true, text: "share of event recordings" } } } }
-});
-
-// Perturbation table (XGBoost check)
-const PX = D.results.perturbation_xgboost_val, PO = D.results.perturbation_opentslm;
-const conds = { original: "Original windows", time_shuffle: "Time order shuffled", noise_signal: "Noise with the same statistics", signal_from_other: "Series from another event", stats_from_other: "Statistics from another event", no_stats: "No statistics in the prompt" };
-document.getElementById("perturb-table").innerHTML =
-  `<tr><th>Condition</th><th>OpenTSLM<br>validation</th><th>OpenTSLM<br>test</th><th>Shape baseline<br>validation</th><th>Mean/std baseline<br>validation</th></tr>` +
-  Object.keys(conds).map(k => `<tr${k === "original" ? ' class="hl"' : ""}><td>${conds[k]}</td><td>${fmt(PO.val[k].macro_f1)}</td><td>${fmt(PO.test[k].macro_f1)}</td><td>${fmt(PX.shape[k].macro_f1)}</td><td>${fmt(PX.mean_std[k].macro_f1)}</td></tr>`).join("");
-const sv = PO.val.stats_from_other, st = PO.test.stats_from_other;
-document.getElementById("perturb-callout").innerHTML =
-  `<b>OpenTSLM reads the signal, not only the numbers in its prompt.</b> Shuffling the time order or replacing the series with noise of the same statistics drops its macro-F1 from ${fmt(PO.val.original.macro_f1)} to ${fmt(PO.val.time_shuffle.macro_f1)} on validation and from ${fmt(PO.test.original.macro_f1)} to ${fmt(PO.test.time_shuffle.macro_f1)} on test; every drop has a paired interval below zero. ` +
-  `It also uses the statistics: when they come from another event, on validation it follows them in ${pct(sv.follows_donor_label)} of windows and its own series in ${pct(sv.follows_original_label)}; on test the conflict is inconclusive (${pct(st.follows_donor_label)} vs ${pct(st.follows_original_label)}).`;
+  // Perturbation table
+  const PO = R.perturbation_opentslm, PX = R.perturbation_xgboost_val;
+  const conds = [
+    ["original", "Original window", "own", "own"],
+    ["time_shuffle", "Time order shuffled", "shuffled", "own"],
+    ["noise_signal", "Series replaced by noise", "noise", "own"],
+    ["signal_from_other", "Series from another event", "swapped", "own"],
+    ["stats_from_other", "Statistics from another event", "own", "swapped"],
+    ["no_stats", "Statistics removed", "own", "none"],
+  ];
+  const cell = (v, color) => `<span class="cell"><span class="track"><span class="fill" style="width:${Math.min(1, v / 0.6) * 100}%;background:${color}"></span></span><span class="mono">${f2(v)}</span></span>`;
+  const pill = (s) => `<span class="pill ${s === "own" ? "" : "hit"}">${s}</span>`;
+  $("perturb").innerHTML =
+    `<tr><th>Condition</th><th style="text-align:left">Series</th><th style="text-align:left">Statistics</th><th>OpenTSLM<br>validation</th><th>OpenTSLM<br>test</th><th>XGBoost shape<br>validation</th><th>XGBoost mean/std<br>validation</th></tr>` +
+    conds.map(([k, label, s, st]) => `<tr><td>${label}</td><td style="text-align:left">${pill(s)}</td><td style="text-align:left">${pill(st)}</td>
+      <td>${cell(PO.val[k].macro_f1, "var(--tslm)")}</td><td>${cell(PO.test[k].macro_f1, "var(--tslm)")}</td>
+      <td>${cell(PX.shape[k].macro_f1, "var(--base)")}</td><td>${cell(PX.mean_std[k].macro_f1, "var(--dim)")}</td></tr>`).join("");
+  const sv = PO.val.stats_from_other, st = PO.test.stats_from_other;
+  $("finding").innerHTML = `<p><b>OpenTSLM reads the shape of the signal.</b> Shuffling the time order, with the statistics in the prompt untouched, drops its macro-F1 from ${f2(PO.val.original.macro_f1)} to ${f2(PO.val.time_shuffle.macro_f1)} on validation and from ${f2(PO.test.original.macro_f1)} to ${f2(PO.test.time_shuffle.macro_f1)} on test; every drop has a paired interval below zero. <b>It also leans on the statistics.</b> When they come from another event, on validation it follows them in ${pct(sv.follows_donor_label)} of windows and its own series in ${pct(sv.follows_original_label)}; on test the conflict is inconclusive (${pct(st.follows_donor_label)} against ${pct(st.follows_original_label)}). The XGBoost columns check the tool: the shape model collapses under time shuffle and the statistics-only model does not move.</p>`;
+})();
 </script>
 </body>
 </html>
