@@ -3,6 +3,7 @@
 Usage:
     uv run python scripts/perturb.py make <windows folder> <output folder> [--split val]
     uv run python scripts/perturb.py xgboost <windows folder> <output folder> [--split val]
+    uv run python scripts/perturb.py score <perturbed folder> <output folder> --predictions <prefix> [--split val]
 
 `make` writes one window folder per condition under <output folder>/<condition>/, in the format of
 docs/DATA_CONTRACT.md, plus the statistics a TSLM prompt must show: `stats_mean` and `stats_std`
@@ -25,6 +26,11 @@ borrowed, so one can measure whether the answer follows the signal or the statis
 `xgboost` runs the two baselines on every condition (they see only the series, so the statistics
 conditions do not change them) as a check of the tool. Use the validation split while developing;
 the test split once at the end (test wells are frozen, docs/DECISIONS.md).
+
+`score` reads `<prefix>_<condition>_<split>.csv` for every condition (for example
+`results/predictions/opentslm_sp_run1`), scores each with scripts/evaluate.py, adds the follow rates in
+the conflict conditions and a paired comparison with `original`, and writes
+`<output folder>/<prefix name>_<split>.json`.
 """
 
 from __future__ import annotations
@@ -128,15 +134,56 @@ def xgboost(windows_dir: Path, out_dir: Path, split: str) -> None:
     (out_dir / f"xgboost_{split}.json").write_text(json.dumps(results, indent=1), encoding="utf-8")
 
 
+def score(perturbed_dir: Path, out_dir: Path, prefix: Path, split: str) -> None:
+    import evaluate
+
+    names = evaluate.class_names(perturbed_dir / "original")
+    loaded = {}
+    for condition in CONDITIONS:
+        path = prefix.parent / f"{prefix.name}_{condition}_{split}.csv"
+        loaded[condition] = evaluate.load(perturbed_dir / condition, path, split, names)
+    results = {}
+    for condition, data in loaded.items():
+        m = evaluate.metrics(data, names)
+        r = {
+            "macro_f1": m["macro_f1_6_classes"],
+            "event_recall": m["event_detection"]["event_recall"],
+            "false_alarm_rate": m["event_detection"]["false_alarm_rate"],
+            "invalid_share": m["invalid_share"],
+            "per_class_f1": {c: v["f1"] for c, v in m["per_class"].items()},
+            "answers": {names.get(int(c), "invalid"): int(n) for c, n in data["pred"].value_counts().items()},
+        }
+        if "donor_label" in data:
+            r.update(follow_rates(data["pred"].to_numpy(), data["label"].to_numpy(), data["donor_label"].to_numpy()))
+        if condition != "original":
+            same = (data["pred"].to_numpy() == loaded["original"]["pred"].to_numpy()).mean()
+            r["same_answer_as_original"] = round(float(same), 4)
+            r["vs_original"] = evaluate.paired_bootstrap(data, loaded["original"])
+        results[condition] = r
+        print(
+            f"{condition:18s} macro-F1 {r['macro_f1']:.3f}  event recall {r['event_recall']:.2f}  "
+            f"false alarms {r['false_alarm_rate']:.2f}"
+            + (f"  follows own {r['follows_original_label']:.2f} donor {r['follows_donor_label']:.2f}" if "donor_label" in data else "")
+            + (f"  same as original {r['same_answer_as_original']:.2f}" if condition != "original" else "")
+        )
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"{prefix.name}_{split}.json").write_text(json.dumps(results, indent=1), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("make", "xgboost"))
+    parser.add_argument("command", choices=("make", "xgboost", "score"))
     parser.add_argument("windows_dir", type=Path)
     parser.add_argument("out_dir", type=Path)
     parser.add_argument("--split", default="val", choices=("val", "test"))
+    parser.add_argument("--predictions", type=Path, help="score: prefix of the predictions files")
     args = parser.parse_args()
     if args.command == "make":
         make(args.windows_dir, args.out_dir, args.split)
+    elif args.command == "score":
+        if args.predictions is None:
+            parser.error("score needs --predictions")
+        score(args.windows_dir, args.out_dir, args.predictions, args.split)
     else:
         xgboost(args.windows_dir, args.out_dir, args.split)
 
