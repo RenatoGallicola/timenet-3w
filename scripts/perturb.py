@@ -156,6 +156,8 @@ def score(perturbed_dir: Path, out_dir: Path, prefix: Path, split: str) -> None:
         if "donor_label" in data:
             r.update(follow_rates(data["pred"].to_numpy(), data["label"].to_numpy(), data["donor_label"].to_numpy()))
         if condition != "original":
+            if not (data["window_id"].to_numpy() == loaded["original"]["window_id"].to_numpy()).all():
+                raise SystemExit(f"{condition}: windows not in the same order as in original")
             same = (data["pred"].to_numpy() == loaded["original"]["pred"].to_numpy()).mean()
             r["same_answer_as_original"] = round(float(same), 4)
             r["vs_original"] = evaluate.paired_bootstrap(data, loaded["original"])
